@@ -38,17 +38,23 @@ export function CartSheet({
 }: CartSheetProps) {
   useEffect(() => {
     if (!open) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-
     document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
+
+    // safe scroll lock: preserve scroll position
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
     };
   }, [open, onClose]);
 
@@ -73,7 +79,7 @@ export function CartSheet({
             onClick={onClose}
             variants={VARIANTS.fadeIn}
             transition={TRANSITION.normal}
-            className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-black/40 prefer-no-backdrop"
           />
 
           <motion.section
@@ -109,14 +115,10 @@ export function CartSheet({
                 {items.map((item) => (
                   <motion.div
                     key={item.key}
-                    layout
-                    initial={{ opacity: 0, y: 14, scale: 0.98 }}
+                    initial={{ opacity: 0, y: 10, scale: 0.99 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: 30, scale: 0.96 }}
-                    transition={{
-                      duration: MOTION.normal,
-                      ease: MOTION.ease,
-                    }}
+                    exit={{ opacity: 0, x: 20, scale: 0.98 }}
+                    transition={TRANSITION.normal}
                   >
                     <CartRow
                       item={item}
@@ -133,7 +135,7 @@ export function CartSheet({
 
         {/* Footer */}
         {items.length > 0 ? (
-          <div className="shrink-0 border-t border-border bg-surface/95 px-4 py-4 backdrop-blur-xl sm:px-5">
+          <div className="shrink-0 border-t border-border bg-surface/95 px-4 py-4 sm:px-5">
             <div className="mb-3 flex items-center justify-between">
               <span className="text-sm text-muted">المجموع</span>
               <span className="text-lg font-semibold text-price">
@@ -249,4 +251,4 @@ function CartRow({
       </button>
     </article>
   );
-}
+            }
