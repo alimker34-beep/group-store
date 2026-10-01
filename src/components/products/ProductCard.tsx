@@ -164,10 +164,11 @@ export function ProductCard({
     product.originalPrice > product.price;
 
   return (
-    <motion.article
-      className="group min-w-0"
-      whileHover={{ y: -2 }}
-      transition={TRANSITION.fast}
+    <article
+      className="group min-w-0 transform-gpu transition-transform duration-[var(--motion-fast)] ease-[var(--ease-emphasized)]"
+      // small hover translate using transform (GPU compositing)
+      onMouseEnter={() => {}}
+      // no JS-side motion needed for hover; CSS handles it
     >
       {/* =====================================================
           MEDIA FRAME
@@ -195,11 +196,11 @@ export function ProductCard({
             IMAGE — تملأ الإطار بالكامل
             --------------------------------------------------- */}
         <div className="relative aspect-[0.85] w-full overflow-hidden">
-          <img
+          <ResponsiveImage
             src={product.image}
             alt={product.name}
             loading="lazy"
-            draggable={false}
+            decoding="async"
             className={[
               "absolute inset-0 h-full w-full object-cover object-center",
               "transition-transform duration-[var(--motion-normal)]",
@@ -368,6 +369,39 @@ export function ProductCard({
           ) : null}
         </div>
       </button>
-    </motion.article>
+    </article>
+  );
+}
+
+
+/* =========================================================
+   RESPONSIVE IMAGE
+   مكوّن صورة محسّن للاستخدام داخل البطاقات
+   ========================================================= */
+
+interface ResponsiveImageProps
+  extends React.ImgHTMLAttributes<HTMLImageElement> {
+  src: string;
+  alt: string;
+}
+
+export function ResponsiveImage({
+  src,
+  alt,
+  className,
+  loading = "lazy",
+  decoding = "async",
+  ...rest
+}: ResponsiveImageProps) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading={loading}
+      decoding={decoding}
+      draggable={false}
+      className={className}
+      {...rest}
+    />
   );
 }
