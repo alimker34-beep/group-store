@@ -49,25 +49,44 @@ export function ProductGrid({
     );
   }
 
+  // client-side incremental render to avoid huge initial DOM
+  const PAGE_SIZE = 24;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const visibleItems = items.slice(0, visibleCount);
+
   return (
     <>
       <div
         dir="rtl"
         className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-9"
       >
-        {items.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            inCart={isInCart?.(product.id) ?? false}
-            favorite={isFavorite?.(product.id) ?? false}
-            onSelect={setSelectedProduct}
-            onQuickAdd={onQuickAdd}
-            onRemoveFromCart={onRemoveFromCart}
-            onFavorite={onToggleFavorite}
-          />
+        {visibleItems.map((product, idx) => (
+          <div key={product.id} className="content-auto">
+            <ProductCard
+              product={product}
+              inCart={isInCart?.(product.id) ?? false}
+              favorite={isFavorite?.(product.id) ?? false}
+              onSelect={setSelectedProduct}
+              onQuickAdd={onQuickAdd}
+              onRemoveFromCart={onRemoveFromCart}
+              onFavorite={onToggleFavorite}
+            />
+          </div>
         ))}
       </div>
+
+      {visibleCount < items.length ? (
+        <div className="mt-6 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((v) => Math.min(items.length, v + PAGE_SIZE))}
+            className="rounded-md px-4 py-2 bg-primary text-inverse shadow-sm"
+          >
+            تحميل المزيد
+          </button>
+        </div>
+      ) : null}
 
       <ProductDetailsSheet
         product={selectedProduct}
