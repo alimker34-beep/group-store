@@ -423,3 +423,48 @@ a {
     --section-gap: 4rem;
   }
 }
+
+
+/* =========================================================
+   PERFORMANCE HELPERS
+   - content-visibility: enable skipping layout/paint for offscreen sections
+   - use with caution; set contain-intrinsic-size to avoid layout jumps.
+   ========================================================= */
+
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 280px; /* adjust per component shape */
+}
+
+/* Prefer GPU compositing for transform animations on interactive elements */
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Avoid heavy backdrop-blur for large overlays on low-end devices.
+   Use .prefer-no-backdrop to switch blur -> solid translucent bg */
+@media (prefers-reduced-motion: reduce), (max-device-width: 480px) {
+  .prefer-no-backdrop {
+    backdrop-filter: none !important;
+    background-color: rgba(0,0,0,0.36) !important;
+  }
+}
+
+/* Scroll lock helper (used by sheet/modal components)
+   Technique: lock body in place without removing from flow abruptly.
+*/
+body.scroll-lock {
+  position: fixed;
+  width: 100%;
+}
+body.scroll-lock > * {
+  /* preserve layout if necessary */
+}
+
+/* Limit expensive backdrop-filter usage globally (developer note):
+   Use class .use-blur on small overlays (headers, buttons).
+*/
+.backdrop-blur-lite {
+  backdrop-filter: blur(6px);
+     }
