@@ -1,64 +1,88 @@
 /* =========================================================
    MOTION — قيم موحّدة لكل أنيميشنات المشروع
+   - مصمّم لتكون compositor-friendly (transform, opacity).
+   - يحترم prefers-reduced-motion ويقلّل التوقيتات.
    ========================================================= */
 
 export const MOTION = {
-  /* Durations (بالثواني — لأن Framer Motion يستخدم ثواني) */
-  fast: 0.16,
-  normal: 0.24,
-  smooth: 0.36,
-  slow: 0.5,
+  /* Durations (seconds — Framer Motion uses seconds) */
+  fast: 0.14,
+  normal: 0.22,
+  smooth: 0.34,
+  slow: 0.48,
   page: 0.42,
-
-  /* Easing */
-  ease: [0.16, 1, 0.3, 1] as const,        // easeOutExpo ناعم
-  easeStandard: [0.2, 0, 0, 1] as const,   // مطابق لـ --ease-standard
-  easeSoft: [0.25, 1, 0.5, 1] as const,    // أشد نعومة
 } as const;
 
-/* انتقالات جاهزة */
+/* Easing tuned for compositor-friendly feel (use transform + opacity) */
+export const EASING = {
+  emph: [0.16, 1, 0.3, 1] as const,
+  standard: [0.2, 0, 0, 1] as const,
+} as const;
+
+/* TRANSITION factory that respects reduced-motion */
+function prefersReducedMotion(): boolean {
+  try {
+    return (
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function transitionFor(key: keyof typeof MOTION) {
+  const reduced = prefersReducedMotion();
+  const base = MOTION[key];
+  return {
+    duration: reduced ? Math.min(0.08, base) : base,
+    ease: EASING.emph,
+  };
+}
+
 export const TRANSITION = {
-  fast: { duration: MOTION.fast, ease: MOTION.ease },
-  normal: { duration: MOTION.normal, ease: MOTION.ease },
-  smooth: { duration: MOTION.smooth, ease: MOTION.ease },
-  slow: { duration: MOTION.slow, ease: MOTION.ease },
-  page: { duration: MOTION.page, ease: MOTION.ease },
+  fast: transitionFor("fast"),
+  normal: transitionFor("normal"),
+  smooth: transitionFor("smooth"),
+  slow: transitionFor("slow"),
+  page: transitionFor("page"),
 } as const;
 
-/* أنماط الدخول/الخروج */
+/* VARIANTS — keep transforms (translate/scale) and opacity only.
+   Use translate3d / numeric transforms where possible (compositor-friendly). */
 export const VARIANTS = {
-  /* ظهور عام */
   fadeIn: {
     initial: { opacity: 0 },
     animate: { opacity: 1 },
     exit: { opacity: 0 },
   },
 
-  /* ظهور + انزلاق من الأسفل (للـ Sheets) */
   sheetUp: {
-    initial: { y: "100%", opacity: 0.6 },
-    animate: { y: 0, opacity: 1 },
-    exit: { y: "100%", opacity: 0.4 },
+    initial: { y: "100%", opacity: 0.85 },
+    animate: { y: "0%", opacity: 1 },
+    exit: { y: "100%", opacity: 0.9 },
   },
 
-  /* ظهور + انزلاق من الأسفل (للأقسام) */
   riseUp: {
-    initial: { y: 22, opacity: 0 },
+    initial: { y: 18, opacity: 0 },
     animate: { y: 0, opacity: 1 },
     exit: { y: 12, opacity: 0 },
   },
 
-  /* ظهور + انزلاق ناعم (للبطاقات) */
   card: {
-    initial: { y: 14, opacity: 0, scale: 0.985 },
+    initial: { y: 12, opacity: 0, scale: 0.992 },
     animate: { y: 0, opacity: 1, scale: 1 },
-    exit: { y: 8, opacity: 0, scale: 0.985 },
+    exit: { y: 8, opacity: 0, scale: 0.992 },
   },
 
-  /* انزلاق أفقي (للصفحات) */
   pageSlide: {
-    initial: { x: 28, opacity: 0 },
+    initial: { x: 24, opacity: 0 },
     animate: { x: 0, opacity: 1 },
-    exit: { x: -28, opacity: 0 },
+    exit: { x: -24, opacity: 0 },
   },
 } as const;
+
+/* Export helper — components can call to quickly check reduced-motion. */
+export function isReducedMotion() {
+  return prefersReducedMotion();
+}
