@@ -102,11 +102,18 @@ export function ProductDetailsSheet({
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
+
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
     };
   }, [open, onClose]);
 
@@ -130,11 +137,12 @@ export function ProductDetailsSheet({
             ease: [0.16, 1, 0.3, 1],
           }}
         >
-          <motion.button
-            type="button"
-            aria-label="إغلاق تفاصيل المنتج"
+          <motion.div
+            aria-hidden
             onClick={onClose}
-            className="absolute inset-0 bg-black/40"
+            variants={VARIANTS.fadeIn}
+            transition={TRANSITION.normal}
+            className="absolute inset-0 bg-black/40 prefer-no-backdrop"
           />
 
           <motion.section
@@ -407,4 +415,4 @@ function QuantityControl({ value, onChange }: QuantityControlProps) {
       </button>
     </div>
   );
-}
+      }
