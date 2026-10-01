@@ -34,8 +34,7 @@ export function FloatingCartButton({
       className={[
         "fixed bottom-4 left-3 z-[var(--z-sticky)] md:hidden",
         "pointer-events-none",
-        "transition-all duration-[var(--motion-slow)]",
-        "ease-[var(--ease-emphasized)]",
+        "transition-all duration-[var(--motion-slow)] ease-[var(--ease-emphasized)]",
         visible
           ? "translate-y-0 opacity-100 blur-0 scale-100"
           : "translate-y-4 opacity-0 blur-sm scale-90",
@@ -46,26 +45,19 @@ export function FloatingCartButton({
         aria-label={`عرض السلة (${count})`}
         onClick={onClick}
         className={[
-          "pointer-events-auto relative",
+          "pointer-events-auto relative transform-gpu",
           "flex h-16 min-w-[80px] items-center justify-center gap-2",
-          "rounded-full bg-neutral-900/85 px-5",
-          "text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
-          "ring-1 ring-white/20 backdrop-blur-2xl",
+          "rounded-full bg-neutral-900/88 px-5",
+          "text-white shadow-sm",
+          "ring-1 ring-white/10",
           "transition-transform duration-[var(--motion-normal)]",
           "ease-[var(--ease-emphasized)]",
           "hover:bg-neutral-900/95 active:scale-95",
         ].join(" ")}
       >
         <CartIcon />
-
         {count > 0 ? (
-          <span
-            className={[
-              "flex min-w-6 h-6 items-center justify-center",
-              "rounded-full bg-white px-1.5",
-              "text-[11px] font-bold text-neutral-900",
-            ].join(" ")}
-          >
+          <span className="flex min-w-6 h-6 items-center justify-center rounded-full bg-white px-1.5 text-[11px] font-bold text-neutral-900">
             {count > 99 ? "99+" : count}
           </span>
         ) : null}
