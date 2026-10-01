@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Lenis from "lenis";
+// Lenis is optional; keep lazy to avoid loading unless explicitly enabled.
+// Toggle via env var or feature flag below.
 import { MOTION, TRANSITION } from "./shared/motion";
 import WelcomePage from "./pages/WelcomePage";
 import HomePage from "./pages/HomePage";
@@ -16,6 +17,12 @@ import {
   type CartItem,
 } from "./components/cart/types";
 import type { Product } from "./components/products/ProductCard";
+
+// Feature flag: false by default => prefer native browser scrolling.
+// To enable for experiments set VITE_USE_LENIS=true in env (optional).
+const FLAG_USE_LENIS = import.meta.env.VITE_USE_LENIS === "true";
+
+type LenisType = any;
 
 type Route =
   | { name: "welcome" }
@@ -104,8 +111,16 @@ function App() {
   const navigate = useCallback((path: string) => {
     window.history.pushState({}, "", path);
     setRoute(resolveRoute(path));
-    /* Lenis يعترض scrollTo افتراضيًا في v1.1+ */
-    window.scrollTo({ top: 0, behavior: "auto" });
+
+    // If Lenis is active (optional), use its scrollTo to avoid mismatch.
+    const lenis = (window as any).__lenis;
+    if (lenis && typeof lenis.scrollTo === "function") {
+      // jump to top immediately without animation when navigating route-change:
+      lenis.scrollTo(0, { immediate: true });
+    } else {
+      // Native jump — keeps pipeline native (best performance)
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
   }, []);
 
   useEffect(() => {
@@ -117,34 +132,63 @@ function App() {
   }, []);
 
   /* ---------------------------------------------
-     LENIS SMOOTH SCROLL
-     يشتغل مرة واحدة، ويوقف عند unmount.
+     SMOOTH SCROLL (Lenis) — optional and controlled
+     Default: OFF. Prefer native browser scroll for best compositor behavior.
+     If enabled (VITE_USE_LENIS=true), load Lenis lazily and run its RAF.
      --------------------------------------------- */
   useEffect(() => {
-    /* احترام تفضيل تقليل الحركة */
-    const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (reduce) return;
+    // respect reduced motion: never init Lenis if user requested reduced motion
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
 
-    const lenis = new Lenis({
-      duration: 1.05,
-      easing: (t: number) => 1 - Math.pow(1 - t, 3),
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 1.6,
-    });
+    if (!FLAG_USE_LENIS) {
+      // Ensure page uses native scroll; do not hijack scroll pipeline.
+      return;
+    }
 
     let rafId = 0;
-    const raf = (time: number) => {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    };
-    rafId = requestAnimationFrame(raf);
+    let lenisInstance: LenisType | null = null;
+    let cancelled = false;
+
+    // Lazy import so the library is not part of initial JS if not used.
+    (async () => {
+      try {
+        const { default: Lenis } = await import("lenis");
+        if (cancelled) return;
+
+        lenisInstance = new Lenis({
+          duration: 1.05,
+          easing: (t: number) => 1 - Math.pow(1 - t, 3),
+          smoothWheel: true,
+          wheelMultiplier: 1,
+          touchMultiplier: 1.6,
+        });
+
+        const frame = (time: number) => {
+          if (!lenisInstance) return;
+          lenisInstance.raf(time);
+          rafId = requestAnimationFrame(frame);
+        };
+
+        rafId = requestAnimationFrame(frame);
+
+        // store to window for debugging/optional use
+        (window as any).__lenis = lenisInstance;
+      } catch (err) {
+        // fail gracefully: continue with native scrolling
+        // console.warn("Lenis failed to load:", err);
+      }
+    })();
 
     return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
+      cancelled = true;
+      if (rafId) cancelAnimationFrame(rafId);
+      // if lenisInstance exists it will be garbage-collected, or caller may provide destroy.
+      const lenis = (window as any).__lenis;
+      if (lenis && typeof lenis.destroy === "function") {
+        lenis.destroy();
+        delete (window as any).__lenis;
+      }
     };
   }, []);
 
