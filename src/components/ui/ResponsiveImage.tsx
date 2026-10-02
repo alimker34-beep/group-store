@@ -6,6 +6,8 @@ interface ResponsiveImageProps extends React.ImgHTMLAttributes<HTMLImageElement>
   srcSet?: string;
   sizes?: string;
   priority?: boolean;
+  width?: number;
+  height?: number;
 }
 
 export function ResponsiveImage({
@@ -16,6 +18,8 @@ export function ResponsiveImage({
   priority = false,
   loading,
   decoding = "async",
+  width,
+  height,
   className,
   ...rest
 }: ResponsiveImageProps) {
@@ -28,6 +32,8 @@ export function ResponsiveImage({
       alt={alt}
       srcSet={srcSet}
       sizes={sizes}
+      width={width}
+      height={height}
       loading={finalLoading}
       decoding={decoding}
       fetchPriority={priority ? "high" : undefined}
