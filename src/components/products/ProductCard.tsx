@@ -379,39 +379,4 @@ export function ProductCard({
       </button>
     </article>
   );
-}
-
-
-/* =========================================================
-   RESPONSIVE IMAGE
-   مكوّن صورة محسّن للاستخدام داخل البطاقات
-   ========================================================= */
-
-interface ResponsiveImageProps
-  extends React.ImgHTMLAttributes<HTMLImageElement> {
-  src: string;
-  alt: string;
-  priority?: boolean;
-}
-
-export function ResponsiveImage({
-  src,
-  alt,
-  className,
-  loading = "lazy",
-  decoding = "async",
-  priority,
-  ...rest
-}: ResponsiveImageProps) {
-  return (
-    <img
-      src={src}
-      alt={alt}
-      loading={loading}
-      decoding={decoding}
-      draggable={false}
-      className={className}
-      {...rest}
-    />
-  );
-}
+  }
