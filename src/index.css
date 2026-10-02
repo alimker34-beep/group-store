@@ -468,3 +468,22 @@ body.scroll-lock > * {
 .backdrop-blur-lite {
   backdrop-filter: blur(6px);
      }
+
+/* Force small interactive elements to GPU layer for smooth transforms */
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Small hover translate for product card (GPU friendly) */
+.card-hover-lift {
+  transition: transform 160ms var(--ease-emphasized), box-shadow 180ms var(--ease-emphasized);
+}
+.card-hover-lift:hover {
+  transform: translate3d(0, -4px, 0);
+}
+
+/* Ensure long lists do not use will-change globally */
+* {
+  will-change: auto;
+     }
