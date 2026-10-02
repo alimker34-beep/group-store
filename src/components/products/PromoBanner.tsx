@@ -1,4 +1,5 @@
 import { Button } from "../ui/Button";
+import ResponsiveImage from "../ui/ResponsiveImage";
 
 interface PromoBannerProps {
   title?: string;
@@ -18,13 +19,15 @@ export function PromoBanner({
   onAction,
 }: PromoBannerProps) {
   return (
-    <section className="relative min-h-[220px] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-neutral-900 shadow-xl transition-all duration-300 sm:min-h-[260px]">
+    <section className="relative min-h-[220px] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-neutral-900 shadow-xl transition-all duration-300 sm:min-h-[260px] content-auto">
       {/* 1. خلفية الصورة الممتدة بالكامل باحترافية */}
       <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
-        <img
+        <ResponsiveImage
           src={imageUrl}
           alt={title}
-          className="h-full w-full object-cover object-center transition-transform duration-700 ease-out hover:scale-105"
+          priority={true}
+          decoding="async"
+          className="h-full w-full object-cover object-center transition-transform duration-300 ease-out will-change-transform"
         />
 
         {/* 2. طبقات التدرج الضوئي لتأمين تباين النصوص بالكامل (Dark Overlay with Directional Gradient) */}
@@ -68,4 +71,4 @@ export function PromoBanner({
       </div>
     </section>
   );
-}
+      }
