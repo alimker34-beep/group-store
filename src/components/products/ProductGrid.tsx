@@ -50,10 +50,30 @@ export function ProductGrid({
   }
 
   // client-side incremental render to avoid huge initial DOM
-  const PAGE_SIZE = 24;
+  const PAGE_SIZE = 15;
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const visibleItems = items.slice(0, visibleCount);
+
+  function prefetchProductImages(product: Product) {
+    // preload main image and a couple gallery images
+    const images = product.images && product.images.length ? product.images : [product.image];
+    for (let i = 0; i < Math.min(images.length, 3); i++) {
+      const img = new Image();
+      img.src = images[i];
+    }
+  }
+
+  // When user hovers a card, prefetch that product + next 4 products
+  function handlePrefetch(index: number) {
+    const start = index;
+    const end = Math.min(items.length, index + 5);
+    for (let i = start; i < end; i++) {
+      const p = items[i];
+      if (!p) continue;
+      prefetchProductImages(p);
+    }
+  }
 
   return (
     <>
@@ -71,6 +91,9 @@ export function ProductGrid({
               onQuickAdd={onQuickAdd}
               onRemoveFromCart={onRemoveFromCart}
               onFavorite={onToggleFavorite}
+              priority={idx < 15}
+              onMouseEnter={() => handlePrefetch(idx)}
+              onFocus={() => handlePrefetch(idx)}
             />
           </div>
         ))}
