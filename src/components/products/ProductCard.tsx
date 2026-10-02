@@ -36,6 +36,7 @@ interface ProductCardProps {
   onSelect?: (product: Product) => void;
   onQuickAdd?: (product: Product) => void;
   onRemoveFromCart?: (product: Product) => void;
+  priority?: boolean;
 }
 
 /* =========================================================
@@ -113,6 +114,7 @@ export function ProductCard({
   onSelect,
   onQuickAdd,
   onRemoveFromCart,
+  priority = false,
 }: ProductCardProps) {
   const [burst, setBurst] = useState(false);
   const [added, setAdded] = useState(false);
@@ -199,7 +201,8 @@ export function ProductCard({
           <ResponsiveImage
             src={product.image}
             alt={product.name}
-            loading="lazy"
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
             decoding="async"
             className={[
               "absolute inset-0 h-full w-full object-cover object-center",
@@ -383,6 +386,7 @@ interface ResponsiveImageProps
   extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
+  priority?: boolean;
 }
 
 export function ResponsiveImage({
@@ -391,6 +395,7 @@ export function ResponsiveImage({
   className,
   loading = "lazy",
   decoding = "async",
+  priority,
   ...rest
 }: ResponsiveImageProps) {
   return (
@@ -404,4 +409,4 @@ export function ResponsiveImage({
       {...rest}
     />
   );
-}
+  }
