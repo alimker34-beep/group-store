@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+// Removed heavy framer-motion wrapping for large sections to avoid mount repaint thrash.
+// Keep framer-motion only for micro-interactions (already used elsewhere).
 import { Header } from "../components/layout/Header";
 import { BottomNav } from "../components/layout/BottomNav";
 import { PromoBanner } from "../components/products/PromoBanner";
@@ -47,44 +48,24 @@ export default function HomePage({
       />
 
       <div className="mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-4 md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]">
-        <motion.section
-          className="mb-6"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: MOTION.smooth, ease: MOTION.ease }}
-        >
+        <div className="mb-6 opacity-100 translate-y-0 will-change-transform">
           <p className="text-sm font-medium text-muted">اكتشف الجديد</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             منتجات تستحق أن تراها
           </h1>
-        </motion.section>
+        </div>
 
-        <motion.section
+        <section
           className="mb-8"
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: MOTION.smooth,
-            ease: MOTION.ease,
-            delay: 0.06,
-          }}
         >
           <PromoBanner
             title="خصم اليوم فقط"
             subtitle="اكتشف تشكيلتنا الجديدة واحصل على عروض مميزة."
             buttonLabel="تصفح العرض"
           />
-        </motion.section>
+        </section>
 
-        <motion.section
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: MOTION.smooth,
-            ease: MOTION.ease,
-            delay: 0.12,
-          }}
-        >
+        <section>
           <div className="mb-4 flex items-end justify-between">
             <div>
               <p className="text-xs font-medium text-muted">مختاراتنا</p>
@@ -107,7 +88,7 @@ export default function HomePage({
             onRemoveFromCart={onRemoveFromCart}
             onToggleFavorite={onToggleFavorite}
           />
-        </motion.section>
+        </section>
       </div>
 
       <BottomNav
