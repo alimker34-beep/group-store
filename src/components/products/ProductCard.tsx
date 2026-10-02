@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { MOTION, TRANSITION } from "../../shared/motion";
+import ResponsiveImage from "../ui/ResponsiveImage";
 
 export type ProductOptionType = "select" | "color" | "quantity" | "text";
 
@@ -37,6 +38,8 @@ interface ProductCardProps {
   onQuickAdd?: (product: Product) => void;
   onRemoveFromCart?: (product: Product) => void;
   priority?: boolean;
+  onMouseEnter?: () => void;
+  onFocus?: () => void;
 }
 
 /* =========================================================
@@ -115,6 +118,8 @@ export function ProductCard({
   onQuickAdd,
   onRemoveFromCart,
   priority = false,
+  onMouseEnter,
+  onFocus,
 }: ProductCardProps) {
   const [burst, setBurst] = useState(false);
   const [added, setAdded] = useState(false);
@@ -167,10 +172,10 @@ export function ProductCard({
 
   return (
     <article
-      className="group min-w-0 transform-gpu transition-transform duration-[var(--motion-fast)] ease-[var(--ease-emphasized)]"
-      // small hover translate using transform (GPU compositing)
-      onMouseEnter={() => {}}
-      // no JS-side motion needed for hover; CSS handles it
+      className="group min-w-0 transform-gpu card-hover-lift"
+      onMouseEnter={onMouseEnter}
+      onFocus={onFocus}
+      tabIndex={0}
     >
       {/* =====================================================
           MEDIA FRAME
@@ -202,13 +207,13 @@ export function ProductCard({
             src={product.image}
             alt={product.name}
             priority={priority}
-            loading={priority ? "eager" : "lazy"}
             decoding="async"
+            loading={priority ? "eager" : "lazy"}
             className={[
               "absolute inset-0 h-full w-full object-cover object-center",
               "transition-transform duration-[var(--motion-normal)]",
               "ease-[var(--ease-emphasized)]",
-              "group-hover:scale-[1.035]",
+              "group-hover:scale-[1.035] will-change-transform transform-gpu",
             ].join(" ")}
           />
 
@@ -409,4 +414,4 @@ export function ResponsiveImage({
       {...rest}
     />
   );
-  }
+}
