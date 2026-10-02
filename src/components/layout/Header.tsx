@@ -1,4 +1,5 @@
 import { IconButton } from "../ui/IconButton";
+import ResponsiveImage from "../ui/ResponsiveImage";
 
 interface HeaderProps {
   storeName?: string;
@@ -50,7 +51,7 @@ export function Header({
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-[var(--z-header)] bg-background/80 backdrop-blur-xl transition-colors duration-300">
+    <header className="sticky top-0 z-[var(--z-header)] bg-background/88 transition-colors duration-300 will-change-transform">
       <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--content-max-width)] items-center justify-between px-3.5 sm:px-4">
         
         {/* 1. الأفاتار المستقل الاحترافي (جاهز لميزة القصص مستقبلاً) */}
@@ -62,9 +63,11 @@ export function Header({
             className="group relative size-11 shrink-0 rounded-full p-[2px] ring-2 ring-primary/80 transition-all duration-300 hover:ring-primary active:scale-95 shadow-sm"
           >
             <div className="size-full overflow-hidden rounded-full bg-surface">
-              <img
+              <ResponsiveImage
                 src={avatarUrl}
                 alt="المتجر"
+                priority={true}
+                decoding="async"
                 className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
             </div>
@@ -110,4 +113,4 @@ export function Header({
       </div>
     </header>
   );
-}
+              }
