@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { IconButton } from "../ui/IconButton";
-import { MOTION } from "../../shared/motion";
+import { MOTION, TRANSITION, VARIANTS } from "../../shared/motion";
 import type { Product, ProductOption } from "./ProductCard";
 
 interface ProductDetailsSheetProps {
@@ -147,16 +147,12 @@ export function ProductDetailsSheet({
 
           <motion.section
             dir="rtl"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              duration: 0.82,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            style={{
-              willChange: "opacity",
-            }}
+            variants={VARIANTS.sheetUp}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={TRANSITION.page}
+            style={{ willChange: "transform, opacity" }}
             className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[94vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-4 sm:rounded-[var(--radius-2xl)]"
           >
             <div className="flex shrink-0 items-center justify-between px-4 py-3 sm:px-5">
@@ -246,7 +242,7 @@ export function ProductDetailsSheet({
               </div>
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 border-t border-border bg-surface/95 p-4 backdrop-blur-xl sm:p-5">
+            <div className="absolute inset-x-0 bottom-0 border-t border-border bg-surface/95 p-4 sm:p-5">
               <Button
                 fullWidth
                 size="lg"
@@ -415,4 +411,4 @@ function QuantityControl({ value, onChange }: QuantityControlProps) {
       </button>
     </div>
   );
-      }
+}
