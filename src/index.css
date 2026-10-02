@@ -487,3 +487,41 @@ body.scroll-lock > * {
 * {
   will-change: auto;
      }
+
+/* ================= PERFORMANCE HELPERS ================= */
+
+/* Allow offscreen sections to skip layout/paint until needed */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 280px; /* اضبط حسب ارتفاع البطاقة */
+}
+
+/* Use GPU compositing for interactive transforms sparingly */
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Small hover lift that is compositor-friendly */
+.card-hover-lift {
+  transition: transform 160ms var(--ease-emphasized), box-shadow 180ms var(--ease-emphasized);
+}
+.card-hover-lift:hover {
+  transform: translate3d(0, -4px, 0);
+}
+
+/* Avoid using backdrop-filter on big elements globally; provide helper class for small overlays */
+.prefer-no-backdrop {
+  backdrop-filter: none !important;
+}
+
+/* Ensure any custom listeners don't block main thread: default touch action */
+html, body, #root, main {
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+}
+
+/* Reset will-change to avoid accidental wide usage */
+* {
+  will-change: auto;
+   }
