@@ -37,7 +37,27 @@ export function ProductGrid({
 }: ProductGridProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const items = products ?? getMockProducts();
+  const PAGE_SIZE = 15;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const visibleItems = (products ?? getMockProducts()).slice(0, visibleCount);
+
+  function prefetchProductImages(product: Product) {
+    const imgs = product.images && product.images.length ? product.images : [product.image];
+    for (let i = 0; i < Math.min(imgs.length, 3); i++) {
+      const img = new Image();
+      img.src = imgs[i];
+    }
+  }
+
+  function handlePrefetch(index: number) {
+    const itemsAll = products ?? getMockProducts();
+    const start = index;
+    const end = Math.min(itemsAll.length, index + 6);
+    for (let i = start; i < end; i++) {
+      prefetchProductImages(itemsAll[i]);
+    }
+  }
 
   if (loading) {
     return (
@@ -47,32 +67,6 @@ export function ProductGrid({
         ))}
       </div>
     );
-  }
-
-  // client-side incremental render to avoid huge initial DOM
-  const PAGE_SIZE = 15;
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-
-  const visibleItems = items.slice(0, visibleCount);
-
-  function prefetchProductImages(product: Product) {
-    // preload main image and a couple gallery images
-    const images = product.images && product.images.length ? product.images : [product.image];
-    for (let i = 0; i < Math.min(images.length, 3); i++) {
-      const img = new Image();
-      img.src = images[i];
-    }
-  }
-
-  // When user hovers a card, prefetch that product + next 4 products
-  function handlePrefetch(index: number) {
-    const start = index;
-    const end = Math.min(items.length, index + 5);
-    for (let i = start; i < end; i++) {
-      const p = items[i];
-      if (!p) continue;
-      prefetchProductImages(p);
-    }
   }
 
   return (
@@ -91,7 +85,7 @@ export function ProductGrid({
               onQuickAdd={onQuickAdd}
               onRemoveFromCart={onRemoveFromCart}
               onFavorite={onToggleFavorite}
-              priority={idx < 15}
+              priority={idx < PAGE_SIZE}
               onMouseEnter={() => handlePrefetch(idx)}
               onFocus={() => handlePrefetch(idx)}
             />
@@ -99,11 +93,11 @@ export function ProductGrid({
         ))}
       </div>
 
-      {visibleCount < items.length ? (
+      {visibleCount < (products ?? getMockProducts()).length ? (
         <div className="mt-6 flex items-center justify-center">
           <button
             type="button"
-            onClick={() => setVisibleCount((v) => Math.min(items.length, v + PAGE_SIZE))}
+            onClick={() => setVisibleCount(v => Math.min((products ?? getMockProducts()).length, v + PAGE_SIZE))}
             className="rounded-md px-4 py-2 bg-primary text-inverse shadow-sm"
           >
             تحميل المزيد
@@ -121,4 +115,4 @@ export function ProductGrid({
       />
     </>
   );
-}
+                           }
