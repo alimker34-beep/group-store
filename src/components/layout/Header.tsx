@@ -84,7 +84,7 @@ export function Header({
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="w-full bg-transparent px-4 pt-3">
+    <header className="w-full bg-transparent px-4 pt-3 pb-6">
       <div className="mx-auto flex h-14 max-w-[var(--content-max-width)] items-center justify-between">
         {/* =====================================================
             [1] الأزرار — يمين
