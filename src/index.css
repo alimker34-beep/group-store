@@ -125,10 +125,9 @@
      ======================================================= */
 
   --header-height: 4rem;
-  --header-curve-height: 32px;
-  --header-curve-radius: 100% 100% 0 0 / 100% 100% 0 0;
   --header-surface: #111111;
   --bottom-nav-height: 4.5rem;
+  --hero-curve-height: 32px;
 
   /* =======================================================
      12. Z-INDEX
@@ -530,26 +529,30 @@ html, body, #root, main {
    }
 
 /* =========================================================
-   HEADER CURVE — الانحناء المعكوس أسفل الهيدر
-   الحد السفلي مستقيم، والزوايا فقط منحنية للخارج (معكوسة)
+   HERO CURVE — انحناء أعلى المحتوى (تحت الهيدر)
+   اللوح العلوي مستقيم، والحواف السفلية منحنية للداخل
    ========================================================= */
 
-.header-curved {
+.hero-curved {
   position: relative;
+  background: var(--theme-background);
+  border-bottom-left-radius: var(--hero-curve-height);
+  border-bottom-right-radius: var(--hero-curve-height);
+  overflow: hidden;
 }
 
-.header-curved::after {
+/* طبقة تعزز الانحناء بصريًا بمزج خفيف مع خلفية الصفحة */
+.hero-curved::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(var(--header-curve-height) * -1);
-  height: var(--header-curve-height);
-  background: var(--header-surface);
-  border-top-left-radius: var(--header-curve-height)
-    var(--header-curve-height);
-  border-top-right-radius: var(--header-curve-height)
-    var(--header-curve-height);
+  bottom: 0;
+  height: calc(var(--hero-curve-height) / 2);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--theme-background) 92%, transparent)
+  );
   pointer-events: none;
-  z-index: -1;
    }
