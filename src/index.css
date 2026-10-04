@@ -529,7 +529,7 @@ html, body, #root, main {
    }
 
 /* =========================================================
-   APP CONTENT CARD — الانحناء العلوي المقوس الداخلي
+   APP CONTENT CARD — الانحناء المنحوت المتداخل
    ========================================================= */
 
 .app-content-card {
@@ -538,4 +538,27 @@ html, body, #root, main {
   border-top-right-radius: 32px;
   position: relative;
   z-index: 10;
+  /* إضافة ظلال خفيفة لإبراز نحت البطاقة فوق الخلفية السوداء */
+  box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.12);
+}
+
+/* رفع زوايا الانحناء لتبدو منحوتة حول الهيدر */
+.app-content-card::before,
+.app-content-card::after {
+  content: "";
+  position: absolute;
+  top: -20px;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.app-content-card::before {
+  right: 0;
+  background-radial: radial-gradient(circle at 0 0, transparent 20px, var(--theme-background) 21px);
+}
+
+.app-content-card::after {
+  left: 0;
+  background-radial: radial-gradient(circle at 100% 0, transparent 20px, var(--theme-background) 21px);
    }
