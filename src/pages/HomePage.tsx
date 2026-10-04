@@ -44,9 +44,9 @@ export default function HomePage({
         onCartClick={() => onNavigate("/checkout")}
       />
 
+      {/* تم حذف style={{ contain: "layout style" }} حتى لا تقص حواف الانحناء */}
       <div
         className="app-content-card -mt-7 mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-5 md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
-        style={{ contain: "layout style" }}
       >
         <div className="mb-6">
           <p className="text-sm font-medium text-muted">اكتشف الجديد</p>
