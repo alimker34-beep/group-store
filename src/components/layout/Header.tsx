@@ -84,7 +84,7 @@ export function Header({
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-[var(--z-header)] bg-[var(--header-surface)] pt-2 pb-6 px-4">
+    <header className="sticky top-0 z-[var(--z-header)] bg-[var(--header-surface)] pt-3 pb-8 px-4">
       <div className="mx-auto flex h-14 max-w-[var(--content-max-width)] items-center justify-between">
         {/* =====================================================
             [1] الأزرار (الثيم + الإشعارات) — يمين
@@ -122,7 +122,7 @@ export function Header({
         {/* =====================================================
             [2] القصة فقط (بدون كبسولة) — بحجم أكبر
             ===================================================== */}
-        <div className="flex translate-y-1.5 items-center">
+        <div className="flex items-center">
           <button
             type="button"
             onClick={onProfileClick}
@@ -171,4 +171,4 @@ export function Header({
       </div>
     </header>
   );
-          }
+      }
