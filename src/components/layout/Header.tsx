@@ -84,7 +84,7 @@ export function Header({
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-[var(--z-header)] bg-background border-b border-border shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_14px_rgba(0,0,0,0.035)]">
+    <header className="sticky top-0 z-[var(--z-header)] bg-background">
       <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--content-max-width)] items-center justify-between px-3.5 sm:px-4">
         {/* =====================================================
             [1] الأزرار (الثيم + الإشعارات) — يمين
@@ -120,7 +120,7 @@ export function Header({
         </div>
 
         {/* =====================================================
-            [2] قصتي — Story + Capsule
+            [2] قصتي — Story + Capsule (معكوسة + ألوان فاخرة)
             ===================================================== */}
         <div className="flex translate-y-1.5 items-center">
           <button
@@ -129,13 +129,39 @@ export function Header({
             aria-label="عرض قصة المتجر"
             className="group flex items-center outline-none"
           >
+            {/* Story Capsule — أصبحت أولاً (على اليسار) */}
+            <span
+              className={[
+                "mr-[-4px] flex h-8 items-center rounded-full",
+                "border border-amber-200/70 dark:border-amber-900/60",
+                "bg-amber-50/90 dark:bg-amber-950/50",
+                "px-3.5",
+                "shadow-[0_2px_8px_rgba(245,158,11,0.08)]",
+                "transition-all duration-200",
+                "group-hover:border-amber-300",
+                "group-hover:bg-amber-100/90",
+                "dark:group-hover:border-amber-800",
+                "dark:group-hover:bg-amber-950/70",
+              ].join(" ")}
+            >
+              <span
+                className={[
+                  "text-[11px] font-bold tracking-wide",
+                  "bg-[linear-gradient(90deg,#d97706,#b45309)]",
+                  "bg-clip-text text-transparent",
+                ].join(" ")}
+              >
+                قصتي
+              </span>
+            </span>
+
             {/* Story */}
             <span
               className={[
                 "relative flex size-[46px] shrink-0 items-center justify-center rounded-full",
-                "bg-[conic-gradient(from_180deg,#38bdf8,#60a5fa,#818cf8,#38bdf8)]",
+                "bg-[conic-gradient(from_180deg,#f59e0b,#d97706,#b45309,#f59e0b)]",
                 "p-[2px]",
-                "shadow-[0_0_0_1px_rgba(56,189,248,0.08)]",
+                "shadow-[0_0_0_1px_rgba(245,158,11,0.08)]",
                 "transition-transform duration-200",
                 "group-hover:scale-[1.03]",
                 "group-active:scale-95",
@@ -146,7 +172,7 @@ export function Header({
                 aria-hidden
                 className={[
                   "absolute -inset-[2px] rounded-full",
-                  "border border-sky-400/20",
+                  "border border-amber-400/20",
                   "opacity-0",
                   "group-hover:opacity-100",
                   "transition-opacity duration-300",
@@ -166,35 +192,9 @@ export function Header({
                 </span>
               </span>
             </span>
-
-            {/* Story Capsule */}
-            <span
-              className={[
-                "-ml-1 flex h-8 items-center rounded-full",
-                "border border-sky-200/70 dark:border-sky-900/60",
-                "bg-sky-50/90 dark:bg-sky-950/50",
-                "px-3.5",
-                "shadow-[0_2px_8px_rgba(56,189,248,0.08)]",
-                "transition-all duration-200",
-                "group-hover:border-sky-300",
-                "group-hover:bg-sky-100/90",
-                "dark:group-hover:border-sky-800",
-                "dark:group-hover:bg-sky-950/70",
-              ].join(" ")}
-            >
-              <span
-                className={[
-                  "text-[11px] font-bold tracking-wide",
-                  "bg-[linear-gradient(90deg,#0ea5e9,#6366f1)]",
-                  "bg-clip-text text-transparent",
-                ].join(" ")}
-              >
-                قصتي
-              </span>
-            </span>
           </button>
         </div>
       </div>
     </header>
   );
-              }
+}
