@@ -84,11 +84,10 @@ export function Header({
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    /* تم استبدال bg-[var(--header-surface)] بـ bg-transparent وإزالة sticky */
-    <header className="w-full bg-transparent pt-3 pb-8 px-4">
+    <header className="w-full bg-transparent px-4 pt-3">
       <div className="mx-auto flex h-14 max-w-[var(--content-max-width)] items-center justify-between">
         {/* =====================================================
-            [1] الأزرار (الثيم + الإشعارات) — يمين
+            [1] الأزرار — يمين
             ===================================================== */}
         <div className="flex items-center gap-1 rounded-full border border-border/80 bg-surface/90 p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] backdrop-blur-md">
           <IconButton
@@ -101,7 +100,7 @@ export function Header({
             {isDark ? <SunIcon /> : <MoonIcon />}
           </IconButton>
 
-          <span className="h-5 w-[1px] bg-border/60" />
+          <span className="h-5 w-px bg-border/60" />
 
           <div className="relative">
             <IconButton
@@ -121,36 +120,36 @@ export function Header({
         </div>
 
         {/* =====================================================
-            [2] القصة فقط (بدون كبسولة) — بحجم أكبر
+            [2] STORY
             ===================================================== */}
-        <div className="flex items-center">
+        <div className="flex translate-y-1 items-center">
           <button
             type="button"
             onClick={onProfileClick}
             aria-label="عرض قصة المتجر"
             className="group flex items-center outline-none"
           >
-            {/* Story — تم تكبيرها إلى 52px */}
+            {/* Story Ring */}
             <span
               className={[
                 "relative flex size-[52px] shrink-0 items-center justify-center rounded-full",
-                "bg-[conic-gradient(from_180deg,#e0f2fe,#bae6fd,#7dd3fc,#e0f2fe)]",
+                "bg-[conic-gradient(from_180deg,#e0f2fe,#7dd3fc,#38bdf8,#93c5fd,#e0f2fe)]",
                 "p-[2px]",
-                "shadow-[0_0_0_1px_rgba(186,230,253,0.15)]",
+                "shadow-[0_0_0_1px_rgba(56,189,248,0.12)]",
                 "transition-transform duration-200",
                 "group-hover:scale-[1.03]",
                 "group-active:scale-95",
               ].join(" ")}
             >
-              {/* Outer soft pulse */}
+              {/* Subtle hover ring */}
               <span
                 aria-hidden
                 className={[
                   "absolute -inset-[2px] rounded-full",
-                  "border border-sky-200/30",
+                  "border border-sky-300/30",
                   "opacity-0",
-                  "group-hover:opacity-100",
                   "transition-opacity duration-300",
+                  "group-hover:opacity-100",
                 ].join(" ")}
               />
 
@@ -172,4 +171,4 @@ export function Header({
       </div>
     </header>
   );
-            }
+}
