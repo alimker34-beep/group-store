@@ -4,19 +4,16 @@ import ResponsiveImage from "../ui/ResponsiveImage";
 interface HeaderProps {
   storeName?: string;
   notificationCount?: number;
-  cartCount?: number;
   avatarUrl?: string;
-  storyUrl?: string;
-  storyCount?: number;
-  hasNewStory?: boolean;
   isDark?: boolean;
+  hasUnseenStory?: boolean; // هل توجد قصة جديدة غير مشاطرة؟
+  storyTitle?: string; // عنوان القصة السريع (مثلاً: "عرض اليوم")
   onToggleTheme?: () => void;
-  onProfileClick?: () => void;
-  onStoryClick?: () => void;
+  onProfileStoryClick?: () => void; // عند الضغط لفتح القصة الواحدة
   onNotificationsClick?: () => void;
-  onCartClick?: () => void;
 }
 
+// أيقونة الهلال
 function MoonIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5 transition-transform duration-300 hover:-rotate-12" fill="none" stroke="currentColor" strokeWidth="2">
@@ -25,6 +22,7 @@ function MoonIcon() {
   );
 }
 
+// أيقونة الشمس
 function SunIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5 text-amber-500 transition-transform duration-300 rotate-90 hover:rotate-180" fill="none" stroke="currentColor" strokeWidth="2">
@@ -34,6 +32,7 @@ function SunIcon() {
   );
 }
 
+// أيقونة الجرس
 function BellIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5.5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -46,104 +45,69 @@ function BellIcon() {
 export function Header({
   notificationCount = 0,
   avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-  storyUrl = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=400&q=80",
-  storyCount = 0,
-  hasNewStory = true,
   isDark = false,
+  hasUnseenStory = true,
+  storyTitle = "عرض اليوم 🔥",
   onToggleTheme,
-  onProfileClick,
-  onStoryClick,
+  onProfileStoryClick,
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-[var(--z-header)] bg-background/88 backdrop-blur-xl transition-colors duration-300">
-      <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--content-max-width)] items-center justify-between gap-2 px-3.5 sm:px-4">
-
-        {/* 1. Avatar المتجر (يمين في RTL) */}
+    <header className="sticky top-0 z-[var(--z-header)] bg-background/85 backdrop-blur-md transition-colors duration-300 will-change-transform border-b border-border/40">
+      <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--content-max-width)] items-center justify-between px-3.5 sm:px-4">
+        
+        {/* 1. القصة الواحدة الاحترافية والملفتة جداً */}
         <div className="flex items-center">
           <button
             type="button"
-            onClick={onProfileClick}
-            aria-label="صورة المتجر"
-            className="group relative size-11 shrink-0 rounded-full p-[2px] ring-2 ring-primary/80 transition-all duration-300 hover:ring-primary active:scale-95 shadow-sm"
+            onClick={onProfileStoryClick}
+            aria-label="مشاهدة القصة والعرض الحصري"
+            className="group relative flex items-center gap-2 rounded-full p-0.5 transition-all duration-300 active:scale-95"
           >
-            <div className="size-full overflow-hidden rounded-full bg-surface">
-              <ResponsiveImage
-                src={avatarUrl}
-                alt="المتجر"
-                priority={true}
-                decoding="async"
-                className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
-              />
+            {/* الحلقة المتدرجة المتحركة للقصة (Gradient Ring) */}
+            <div
+              className={`relative flex size-12 shrink-0 items-center justify-center rounded-full p-[2.5px] transition-all duration-500 ${
+                hasUnseenStory
+                  ? "bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 shadow-[0_0_15px_rgba(244,63,94,0.35)] animate-pulse"
+                  : "bg-border/60"
+              }`}
+            >
+              {/* الإطار الداخلي الفاصل */}
+              <div className="size-full overflow-hidden rounded-full bg-background p-[2px]">
+                <div className="size-full overflow-hidden rounded-full bg-surface">
+                  <ResponsiveImage
+                    src={avatarUrl}
+                    alt="قصة المتجر"
+                    priority={true}
+                    decoding="async"
+                    className="size-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                </div>
+              </div>
+
+              {/* شارة القصة أو البث الحي المدمجة */}
+              {hasUnseenStory && (
+                <span className="absolute -bottom-1 z-10 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 px-1.5 py-0.2 text-[9px] font-bold text-white shadow-md ring-2 ring-background">
+                  قصة
+                </span>
+              )}
             </div>
-            <span className="absolute bottom-0.5 right-0.5 size-3 rounded-full bg-emerald-500 ring-2 ring-background" />
+
+            {/* نص العرض/القصة الفرعي بجانب الأفاتار (يعزز نقر الزبون) */}
+            <div className="hidden min-w-0 text-right sm:block">
+              <span className="block text-xs font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">
+                {storyTitle}
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                {hasUnseenStory ? "شاهد حالة اليوم" : "تمت المشاهدة"}
+              </span>
+            </div>
           </button>
         </div>
 
-        {/* 2. القصة (يسار في RTL) — شريط منحوت + قصة واحدة */}
-        <button
-          type="button"
-          onClick={onStoryClick}
-          aria-label="عرض قصة اليوم"
-          className="group relative flex items-center gap-2.5 transition-transform duration-300 active:scale-[0.97]"
-        >
-          {/* النص: "قصة اليوم" + مؤشر */}
-          <div className="flex flex-col items-end leading-none">
-            <span className="text-[10px] font-medium text-muted">
-              قصة اليوم
-            </span>
-            <span className="mt-0.5 text-[11px] font-semibold text-foreground">
-              عرض خاص 🔥
-            </span>
-          </div>
-
-          {/* الشريط المنحوت + القصة */}
-          <div className="relative">
-            {/* الحلقة الخارجية: إطار متدرج متحرك (Gradient ring) */}
-            {hasNewStory ? (
-              <span
-                aria-hidden
-                className="absolute -inset-[3px] rounded-full opacity-90 blur-[0.5px] animate-[storySpin_4s_linear_infinite]"
-                style={{
-                  background:
-                    "conic-gradient(from 0deg, #f59e0b, #ec4899, #8b5cf6, #06b6d4, #f59e0b)",
-                }}
-              />
-            ) : (
-              <span
-                aria-hidden
-                className="absolute -inset-[3px] rounded-full bg-border"
-              />
-            )}
-
-            {/* الطبقة الفاصلة (خلفية الصفحة) — تعطي "حفر" بصري */}
-            <span
-              aria-hidden
-              className="absolute -inset-[1px] rounded-full bg-background"
-            />
-
-            {/* الإطار الداخلي: القصة */}
-            <div className="relative size-11 overflow-hidden rounded-full bg-surface">
-              <ResponsiveImage
-                src={storyUrl}
-                alt="قصة اليوم"
-                priority={true}
-                decoding="async"
-                className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.08]"
-              />
-            </div>
-
-            {/* شارة عدد القصص (اختياري) */}
-            {storyCount > 1 ? (
-              <span className="absolute -bottom-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-bold text-background ring-2 ring-background">
-                {storyCount > 9 ? "9+" : storyCount}
-              </span>
-            ) : null}
-          </div>
-        </button>
-
-        {/* 3. كبسولة الثيم + الجرس (وسط البصري) */}
+        {/* 2. الحاوية الكبسولية (الوضع الليلي + زر الجرس) */}
         <div className="flex items-center gap-1 rounded-full border border-border/80 bg-surface/90 p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] backdrop-blur-md">
+          {/* زر التبديل بين الوضع الليلي والنهاري */}
           <IconButton
             label={isDark ? "تفعيل الوضع النهاري" : "تفعيل الوضع الليلي"}
             variant="ghost"
@@ -154,8 +118,10 @@ export function Header({
             {isDark ? <SunIcon /> : <MoonIcon />}
           </IconButton>
 
+          {/* خط فاصل */}
           <span className="h-5 w-[1px] bg-border/60" />
 
+          {/* زر الجرس مع التنبيه */}
           <div className="relative">
             <IconButton
               label="الإشعارات والتنبيهات"
@@ -176,4 +142,4 @@ export function Header({
       </div>
     </header>
   );
-            }
+}
