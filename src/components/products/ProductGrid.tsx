@@ -18,7 +18,7 @@ interface ProductGridProps {
 
 function ProductSkeleton() {
   return (
-    <div className="animate-pulse">
+    <div>
       <div className="aspect-[0.86] rounded-[var(--radius-lg)] bg-surface-muted" />
       <div className="mt-3 h-4 w-3/4 rounded-full bg-surface-muted" />
       <div className="mt-2 h-3 w-1/2 rounded-full bg-surface-muted" />
@@ -40,24 +40,8 @@ export function ProductGrid({
   const PAGE_SIZE = 15;
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const visibleItems = (products ?? getMockProducts()).slice(0, visibleCount);
-
-  function prefetchProductImages(product: Product) {
-    const imgs = product.images && product.images.length ? product.images : [product.image];
-    for (let i = 0; i < Math.min(imgs.length, 3); i++) {
-      const img = new Image();
-      img.src = imgs[i];
-    }
-  }
-
-  function handlePrefetch(index: number) {
-    const itemsAll = products ?? getMockProducts();
-    const start = index;
-    const end = Math.min(itemsAll.length, index + 6);
-    for (let i = start; i < end; i++) {
-      prefetchProductImages(itemsAll[i]);
-    }
-  }
+  const items = products ?? getMockProducts();
+  const visibleItems = items.slice(0, visibleCount);
 
   if (loading) {
     return (
@@ -76,7 +60,7 @@ export function ProductGrid({
         className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-9"
       >
         {visibleItems.map((product, idx) => (
-          <div key={product.id} className="content-auto">
+          <div key={product.id} className="min-w-0">
             <ProductCard
               product={product}
               inCart={isInCart?.(product.id) ?? false}
@@ -85,20 +69,20 @@ export function ProductGrid({
               onQuickAdd={onQuickAdd}
               onRemoveFromCart={onRemoveFromCart}
               onFavorite={onToggleFavorite}
-              priority={idx < PAGE_SIZE}
-              onMouseEnter={() => handlePrefetch(idx)}
-              onFocus={() => handlePrefetch(idx)}
+              priority={idx < 4}
             />
           </div>
         ))}
       </div>
 
-      {visibleCount < (products ?? getMockProducts()).length ? (
+      {visibleCount < items.length ? (
         <div className="mt-6 flex items-center justify-center">
           <button
             type="button"
-            onClick={() => setVisibleCount(v => Math.min((products ?? getMockProducts()).length, v + PAGE_SIZE))}
-            className="rounded-md px-4 py-2 bg-primary text-inverse shadow-sm"
+            onClick={() =>
+              setVisibleCount(v => Math.min(items.length, v + PAGE_SIZE))
+            }
+            className="rounded-md bg-primary px-4 py-2 text-inverse shadow-sm"
           >
             تحميل المزيد
           </button>
@@ -115,4 +99,4 @@ export function ProductGrid({
       />
     </>
   );
-                           }
+                              }
