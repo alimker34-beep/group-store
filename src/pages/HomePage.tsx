@@ -33,7 +33,7 @@ export default function HomePage({
   const showFloating = cartCount > 0;
 
   return (
-    <main className="min-h-[100dvh] bg-background">
+    <main className="min-h-[100dvh] bg-[var(--header-surface)]">
       <Header
         storeName="GROUP STORE"
         notificationCount={2}
@@ -45,7 +45,7 @@ export default function HomePage({
       />
 
       <div
-        className="hero-curved mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-6 md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
+        className="app-content-card -mt-3 mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-6 md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
         style={{ contain: "layout style" }}
       >
         <div className="mb-6">
@@ -106,4 +106,4 @@ export default function HomePage({
       />
     </main>
   );
-       }
+}
