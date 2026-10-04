@@ -45,7 +45,7 @@ export default function HomePage({
       />
 
       <div
-        className="mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-4 md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
+        className="mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-[calc(var(--header-curve-height)+1rem)] md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
         style={{ contain: "layout style" }}
       >
         <div className="mb-6">
