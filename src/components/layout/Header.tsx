@@ -6,14 +6,17 @@ interface HeaderProps {
   notificationCount?: number;
   cartCount?: number;
   avatarUrl?: string;
+  storyUrl?: string;
+  storyCount?: number;
+  hasNewStory?: boolean;
   isDark?: boolean;
   onToggleTheme?: () => void;
   onProfileClick?: () => void;
+  onStoryClick?: () => void;
   onNotificationsClick?: () => void;
   onCartClick?: () => void;
 }
 
-// أيقونة الهلال (مكبرة ومحسنة)
 function MoonIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5 transition-transform duration-300 hover:-rotate-12" fill="none" stroke="currentColor" strokeWidth="2">
@@ -22,7 +25,6 @@ function MoonIcon() {
   );
 }
 
-// أيقونة الشمس (مكبرة ومحسنة)
 function SunIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5 text-amber-500 transition-transform duration-300 rotate-90 hover:rotate-180" fill="none" stroke="currentColor" strokeWidth="2">
@@ -32,7 +34,6 @@ function SunIcon() {
   );
 }
 
-// أيقونة الجرس (مكبرة ومحسنة)
 function BellIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-5.5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -45,21 +46,25 @@ function BellIcon() {
 export function Header({
   notificationCount = 0,
   avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+  storyUrl = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=400&q=80",
+  storyCount = 0,
+  hasNewStory = true,
   isDark = false,
   onToggleTheme,
   onProfileClick,
+  onStoryClick,
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-[var(--z-header)] bg-background/88 transition-colors duration-300 will-change-transform">
-      <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--content-max-width)] items-center justify-between px-3.5 sm:px-4">
-        
-        {/* 1. الأفاتار المستقل الاحترافي (جاهز لميزة القصص مستقبلاً) */}
+    <header className="sticky top-0 z-[var(--z-header)] bg-background/88 backdrop-blur-xl transition-colors duration-300">
+      <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--content-max-width)] items-center justify-between gap-2 px-3.5 sm:px-4">
+
+        {/* 1. Avatar المتجر (يمين في RTL) */}
         <div className="flex items-center">
           <button
             type="button"
             onClick={onProfileClick}
-            aria-label="صورة المتجر والحساب"
+            aria-label="صورة المتجر"
             className="group relative size-11 shrink-0 rounded-full p-[2px] ring-2 ring-primary/80 transition-all duration-300 hover:ring-primary active:scale-95 shadow-sm"
           >
             <div className="size-full overflow-hidden rounded-full bg-surface">
@@ -71,14 +76,74 @@ export function Header({
                 className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
             </div>
-            {/* مؤشر متصل الآن / قصة جديدة مستقبلياً */}
             <span className="absolute bottom-0.5 right-0.5 size-3 rounded-full bg-emerald-500 ring-2 ring-background" />
           </button>
         </div>
 
-        {/* 2. الحاوية الكبسولية التي تجمع (الوضع الليلي + زر الجرس) */}
+        {/* 2. القصة (يسار في RTL) — شريط منحوت + قصة واحدة */}
+        <button
+          type="button"
+          onClick={onStoryClick}
+          aria-label="عرض قصة اليوم"
+          className="group relative flex items-center gap-2.5 transition-transform duration-300 active:scale-[0.97]"
+        >
+          {/* النص: "قصة اليوم" + مؤشر */}
+          <div className="flex flex-col items-end leading-none">
+            <span className="text-[10px] font-medium text-muted">
+              قصة اليوم
+            </span>
+            <span className="mt-0.5 text-[11px] font-semibold text-foreground">
+              عرض خاص 🔥
+            </span>
+          </div>
+
+          {/* الشريط المنحوت + القصة */}
+          <div className="relative">
+            {/* الحلقة الخارجية: إطار متدرج متحرك (Gradient ring) */}
+            {hasNewStory ? (
+              <span
+                aria-hidden
+                className="absolute -inset-[3px] rounded-full opacity-90 blur-[0.5px] animate-[storySpin_4s_linear_infinite]"
+                style={{
+                  background:
+                    "conic-gradient(from 0deg, #f59e0b, #ec4899, #8b5cf6, #06b6d4, #f59e0b)",
+                }}
+              />
+            ) : (
+              <span
+                aria-hidden
+                className="absolute -inset-[3px] rounded-full bg-border"
+              />
+            )}
+
+            {/* الطبقة الفاصلة (خلفية الصفحة) — تعطي "حفر" بصري */}
+            <span
+              aria-hidden
+              className="absolute -inset-[1px] rounded-full bg-background"
+            />
+
+            {/* الإطار الداخلي: القصة */}
+            <div className="relative size-11 overflow-hidden rounded-full bg-surface">
+              <ResponsiveImage
+                src={storyUrl}
+                alt="قصة اليوم"
+                priority={true}
+                decoding="async"
+                className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.08]"
+              />
+            </div>
+
+            {/* شارة عدد القصص (اختياري) */}
+            {storyCount > 1 ? (
+              <span className="absolute -bottom-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-bold text-background ring-2 ring-background">
+                {storyCount > 9 ? "9+" : storyCount}
+              </span>
+            ) : null}
+          </div>
+        </button>
+
+        {/* 3. كبسولة الثيم + الجرس (وسط البصري) */}
         <div className="flex items-center gap-1 rounded-full border border-border/80 bg-surface/90 p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] backdrop-blur-md">
-          {/* زر التبديل بين الوضع الليلي والنهاري */}
           <IconButton
             label={isDark ? "تفعيل الوضع النهاري" : "تفعيل الوضع الليلي"}
             variant="ghost"
@@ -89,10 +154,8 @@ export function Header({
             {isDark ? <SunIcon /> : <MoonIcon />}
           </IconButton>
 
-          {/* خط فاصل بين الزرين ليعطي طابع كبسولي متناسق */}
           <span className="h-5 w-[1px] bg-border/60" />
 
-          {/* زر الجرس مع التنبيه */}
           <div className="relative">
             <IconButton
               label="الإشعارات والتنبيهات"
@@ -113,4 +176,4 @@ export function Header({
       </div>
     </header>
   );
-              }
+            }
