@@ -171,9 +171,9 @@
 
 /* =======================================================
    DARK MODE OVERRIDES
-   يتم تفعيلها تلقائياً عند إضافة كلاس dark
    ======================================================= */
 .dark {
+  --header-surface: #000000; /* تجعل خلفية الهيدر سوداء تماماً لتباين ساحر مع الكارت */
   --theme-primary: #ffffff;
   --theme-primary-hover: #e5e5e5;
   --theme-primary-active: #cccccc;
@@ -184,7 +184,7 @@
   --theme-accent: #ffffff;
   --theme-accent-soft: #1a1a1c;
 
-  --theme-background: #0d0d0f;
+  --theme-background: #121214; /* درجة مختلفة لتمييز بطاقة المحتوى عن الهيدر */
   --theme-surface: #161618;
   --theme-surface-muted: #1e1e22;
   --theme-surface-elevated: #242428;
@@ -206,12 +206,6 @@
 
 /* =========================================================
    TAILWIND THEME MAPPING
-   Allows UI components to use semantic utilities:
-   bg-primary
-   text-primary
-   border-border
-   text-muted
-   etc.
    ========================================================= */
 
 @theme inline {
@@ -357,7 +351,6 @@ a {
 
 /* =========================================================
    FOCUS
-   Unified accessibility focus treatment.
    ========================================================= */
 
 :focus-visible {
@@ -429,23 +422,18 @@ a {
 
 /* =========================================================
    PERFORMANCE HELPERS
-   - content-visibility: enable skipping layout/paint for offscreen sections
-   - use with caution; set contain-intrinsic-size to avoid layout jumps.
    ========================================================= */
 
 .content-auto {
   content-visibility: auto;
-  contain-intrinsic-size: 280px; /* adjust per component shape */
+  contain-intrinsic-size: 280px;
 }
 
-/* Prefer GPU compositing for transform animations on interactive elements */
 .transform-gpu {
   transform: translateZ(0);
   will-change: transform, opacity;
 }
 
-/* Avoid heavy backdrop-blur for large overlays on low-end devices.
-   Use .prefer-no-backdrop to switch blur -> solid translucent bg */
 @media (prefers-reduced-motion: reduce), (max-device-width: 480px) {
   .prefer-no-backdrop {
     backdrop-filter: none !important;
@@ -453,31 +441,22 @@ a {
   }
 }
 
-/* Scroll lock helper (used by sheet/modal components)
-   Technique: lock body in place without removing from flow abruptly.
-*/
 body.scroll-lock {
   position: fixed;
   width: 100%;
 }
 body.scroll-lock > * {
-  /* preserve layout if necessary */
 }
 
-/* Limit expensive backdrop-filter usage globally (developer note):
-   Use class .use-blur on small overlays (headers, buttons).
-*/
 .backdrop-blur-lite {
   backdrop-filter: blur(6px);
      }
 
-/* Force small interactive elements to GPU layer for smooth transforms */
 .transform-gpu {
   transform: translateZ(0);
   will-change: transform, opacity;
 }
 
-/* Small hover translate for product card (GPU friendly) */
 .card-hover-lift {
   transition: transform 160ms var(--ease-emphasized), box-shadow 180ms var(--ease-emphasized);
 }
@@ -485,26 +464,22 @@ body.scroll-lock > * {
   transform: translate3d(0, -4px, 0);
 }
 
-/* Ensure long lists do not use will-change globally */
 * {
   will-change: auto;
      }
 
 /* ================= PERFORMANCE HELPERS ================= */
 
-/* Allow offscreen sections to skip layout/paint until needed */
 .content-auto {
   content-visibility: auto;
-  contain-intrinsic-size: 280px; /* اضبط حسب ارتفاع البطاقة */
+  contain-intrinsic-size: 280px;
 }
 
-/* Use GPU compositing for interactive transforms sparingly */
 .transform-gpu {
   transform: translateZ(0);
   will-change: transform, opacity;
 }
 
-/* Small hover lift that is compositor-friendly */
 .card-hover-lift {
   transition: transform 160ms var(--ease-emphasized), box-shadow 180ms var(--ease-emphasized);
 }
@@ -512,18 +487,15 @@ body.scroll-lock > * {
   transform: translate3d(0, -4px, 0);
 }
 
-/* Avoid using backdrop-filter on big elements globally; provide helper class for small overlays */
 .prefer-no-backdrop {
   backdrop-filter: none !important;
 }
 
-/* Ensure any custom listeners don't block main thread: default touch action */
 html, body, #root, main {
   -ms-touch-action: pan-y;
   touch-action: pan-y;
 }
 
-/* Reset will-change to avoid accidental wide usage */
 * {
   will-change: auto;
    }
@@ -538,8 +510,8 @@ html, body, #root, main {
   border-top-right-radius: 32px;
   position: relative;
   z-index: 10;
-  /* إضافة ظلال خفيفة لإبراز نحت البطاقة فوق الخلفية السوداء */
-  box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.12);
+  /* ظلال ناعمة لإبراز نحت البطاقة فوق الخلفية */
+  box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.15);
 }
 
 /* رفع زوايا الانحناء لتبدو منحوتة حول الهيدر */
@@ -551,6 +523,7 @@ html, body, #root, main {
   width: 20px;
   height: 20px;
   pointer-events: none;
+  z-index: 10;
 }
 
 .app-content-card::before {
