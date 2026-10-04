@@ -1,109 +1,558 @@
-import { Header } from "../components/layout/Header";
-import { BottomNav } from "../components/layout/BottomNav";
-import { PromoBanner } from "../components/products/PromoBanner";
-import { ProductGrid } from "../components/products/ProductGrid";
-import type { Product } from "../components/products/ProductCard";
+@import "tailwindcss";
 
-interface HomePageProps {
-  onNavigate: (path: string) => void;
-  cartCount: number;
-  onAddToCart: (
-    product: Product,
-    selections?: Record<string, string>,
-  ) => void;
-  onRemoveFromCart: (product: Product) => void;
-  isInCart: (productId: string) => boolean;
-  favorites: string[];
-  onToggleFavorite: (product: Product) => void;
-  isDark: boolean;
-  onToggleTheme: () => void;
+/* =========================================================
+   GROUP STORE — DESIGN SYSTEM
+   Single source of truth for the entire storefront.
+   Client-specific theme changes should happen here.
+   ========================================================= */
+
+:root {
+  /* =======================================================
+     01. BRAND
+     Change these values for a specific client/store.
+     ======================================================= */
+
+  --theme-primary: #111111;
+  --theme-primary-hover: #252525;
+  --theme-primary-active: #000000;
+
+  --theme-secondary: #f3f3f3;
+  --theme-secondary-hover: #e9e9e9;
+
+  --theme-accent: #111111;
+  --theme-accent-soft: #f5f5f5;
+
+  /* =======================================================
+     02. SURFACES
+     ======================================================= */
+
+  --theme-background: #ffffff;
+  --theme-surface: #ffffff;
+  --theme-surface-muted: #f7f7f7;
+  --theme-surface-elevated: #ffffff;
+
+  /* =======================================================
+     03. TEXT
+     ======================================================= */
+
+  --theme-text: #111111;
+  --theme-text-secondary: #555555;
+  --theme-text-muted: #888888;
+  --theme-text-inverse: #ffffff;
+  --theme-text-disabled: #b5b5b5;
+
+  /* =======================================================
+     04. BORDERS
+     ======================================================= */
+
+  --theme-border: #e7e7e7;
+  --theme-border-strong: #d5d5d5;
+  --theme-border-focus: var(--theme-primary);
+
+  /* =======================================================
+     05. STATUS
+     ======================================================= */
+
+  --theme-success: #16803c;
+  --theme-success-soft: #eaf7ef;
+
+  --theme-warning: #b7791f;
+  --theme-warning-soft: #fff7e6;
+
+  --theme-danger: #d92d20;
+  --theme-danger-soft: #fff0ee;
+
+  --theme-info: #2563eb;
+  --theme-info-soft: #eff6ff;
+
+  /* =======================================================
+     06. PRODUCT / COMMERCE
+     ======================================================= */
+
+  --theme-price: var(--theme-text);
+  --theme-sale: var(--theme-danger);
+  --theme-rating: #f59e0b;
+  --theme-stock: var(--theme-success);
+
+  /* =======================================================
+     07. RADIUS
+     ======================================================= */
+
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* =======================================================
+     08. SHADOWS
+     ======================================================= */
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.05);
+  --shadow-md: 0 6px 20px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.10);
+  --shadow-xl: 0 20px 50px rgb(0 0 0 / 0.12);
+
+  /* =======================================================
+     09. MOTION
+     ======================================================= */
+
+  --motion-fast: 120ms;
+  --motion-normal: 180ms;
+  --motion-slow: 280ms;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* =======================================================
+     10. LAYOUT
+     ======================================================= */
+
+  --content-max-width: 1280px;
+
+  --page-padding-mobile: 1rem;
+  --page-padding-tablet: 1.5rem;
+  --page-padding-desktop: 2rem;
+
+  --section-gap: 2.5rem;
+  --component-gap: 1rem;
+
+  /* =======================================================
+     11. HEADER / NAVIGATION
+     ======================================================= */
+
+  --header-height: 4rem;
+  --header-surface: #111111;
+  --bottom-nav-height: 4.5rem;
+  --hero-curve-height: 32px;
+
+  /* =======================================================
+     12. Z-INDEX
+     ======================================================= */
+
+  --z-base: 0;
+  --z-content: 10;
+  --z-header: 50;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 500;
+  --z-modal: 600;
+  --z-toast: 700;
+
+  /* =======================================================
+     13. TYPOGRAPHY
+     ======================================================= */
+
+  --font-sans:
+    "Inter",
+    "Noto Sans Arabic",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
 }
 
-export default function HomePage({
-  onNavigate,
-  cartCount,
-  onAddToCart,
-  onRemoveFromCart,
-  isInCart,
-  favorites,
-  onToggleFavorite,
-  isDark,
-  onToggleTheme,
-}: HomePageProps) {
-  const showFloating = cartCount > 0;
+/* =======================================================
+   DARK MODE OVERRIDES
+   يتم تفعيلها تلقائياً عند إضافة كلاس dark
+   ======================================================= */
+.dark {
+  --theme-primary: #ffffff;
+  --theme-primary-hover: #e5e5e5;
+  --theme-primary-active: #cccccc;
 
-  return (
-    <main className="min-h-[100dvh] bg-background">
-      <Header
-        storeName="GROUP STORE"
-        notificationCount={2}
-        cartCount={cartCount}
-        isDark={isDark}
-        onToggleTheme={onToggleTheme}
-        onNotificationsClick={() => onNavigate("/notifications")}
-        onCartClick={() => onNavigate("/checkout")}
-      />
+  --theme-secondary: #1e1e20;
+  --theme-secondary-hover: #2a2a2d;
 
-      <div
-        className="mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-[calc(var(--header-curve-height)+1rem)] md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
-        style={{ contain: "layout style" }}
-      >
-        <div className="mb-6">
-          <p className="text-sm font-medium text-muted">اكتشف الجديد</p>
+  --theme-accent: #ffffff;
+  --theme-accent-soft: #1a1a1c;
 
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-            منتجات تستحق أن تراها
-          </h1>
-        </div>
+  --theme-background: #0d0d0f;
+  --theme-surface: #161618;
+  --theme-surface-muted: #1e1e22;
+  --theme-surface-elevated: #242428;
 
-        <section className="mb-8" style={{ contain: "layout paint" }}>
-          <PromoBanner
-            title="خصم اليوم فقط"
-            subtitle="اكتشف تشكيلتنا الجديدة واحصل على عروض مميزة."
-            buttonLabel="تصفح العرض"
-          />
-        </section>
+  --theme-text: #f4f4f6;
+  --theme-text-secondary: #a0a0a8;
+  --theme-text-muted: #70707a;
+  --theme-text-inverse: #111111;
+  --theme-text-disabled: #505058;
 
-        <section style={{ contain: "layout" }}>
-          <div className="mb-4 flex items-end justify-between">
-            <div>
-              <p className="text-xs font-medium text-muted">مختاراتنا</p>
+  --theme-border: #26262a;
+  --theme-border-strong: #38383e;
 
-              <h2 className="mt-1 text-xl font-semibold text-foreground">
-                الأكثر طلبًا
-              </h2>
-            </div>
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 6px 20px rgb(0 0 0 / 0.5);
+}
 
-            <button
-              type="button"
-              className="text-sm font-medium text-muted transition-[color] duration-[var(--motion-normal)] hover:text-foreground"
-            >
-              عرض الكل
-            </button>
-          </div>
 
-          <ProductGrid
-            isInCart={isInCart}
-            isFavorite={(id) => favorites.includes(id)}
-            onQuickAdd={onAddToCart}
-            onRemoveFromCart={onRemoveFromCart}
-            onToggleFavorite={onToggleFavorite}
-          />
-        </section>
-      </div>
+/* =========================================================
+   TAILWIND THEME MAPPING
+   Allows UI components to use semantic utilities:
+   bg-primary
+   text-primary
+   border-border
+   text-muted
+   etc.
+   ========================================================= */
 
-      <BottomNav
-        active="home"
-        notificationCount={2}
-        cartCount={cartCount}
-        shifted={showFloating}
-        onNavigate={(id) => {
-          if (id === "home") onNavigate("/store");
-          if (id === "favorites") onNavigate("/favorites");
-          if (id === "notifications") onNavigate("/notifications");
-          if (id === "cart") onNavigate("/checkout");
-        }}
-      />
-    </main>
+@theme inline {
+  --color-primary: var(--theme-primary);
+  --color-primary-hover: var(--theme-primary-hover);
+  --color-primary-active: var(--theme-primary-active);
+
+  --color-secondary: var(--theme-secondary);
+  --color-secondary-hover: var(--theme-secondary-hover);
+
+  --color-accent: var(--theme-accent);
+  --color-accent-soft: var(--theme-accent-soft);
+
+  --color-background: var(--theme-background);
+  --color-surface: var(--theme-surface);
+  --color-surface-muted: var(--theme-surface-muted);
+  --color-surface-elevated: var(--theme-surface-elevated);
+
+  --color-foreground: var(--theme-text);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-muted: var(--theme-text-muted);
+  --color-inverse: var(--theme-text-inverse);
+
+  --color-border: var(--theme-border);
+  --color-border-strong: var(--theme-border-strong);
+
+  --color-success: var(--theme-success);
+  --color-success-soft: var(--theme-success-soft);
+
+  --color-warning: var(--theme-warning);
+  --color-warning-soft: var(--theme-warning-soft);
+
+  --color-danger: var(--theme-danger);
+  --color-danger-soft: var(--theme-danger-soft);
+
+  --color-info: var(--theme-info);
+  --color-info-soft: var(--theme-info-soft);
+
+  --color-price: var(--theme-price);
+  --color-sale: var(--theme-sale);
+  --color-rating: var(--theme-rating);
+  --color-stock: var(--theme-stock);
+
+  --font-sans: var(--font-sans);
+}
+
+
+/* =========================================================
+   GLOBAL RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--theme-background);
+  color: var(--theme-text);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Lenis: يمنع scroll-behavior:smooth من التعارض */
+  scroll-behavior: auto;
+}
+
+/* Lenis: يمنع تمرير الخلفية أثناء فتح Sheet */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--theme-background);
+  color: var(--theme-text);
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+/* =========================================================
+   ROOT
+   ========================================================= */
+
+#root {
+  min-height: 100vh;
+}
+
+
+/* =========================================================
+   SELECTION
+   ========================================================= */
+
+::selection {
+  background: var(--theme-primary);
+  color: var(--theme-text-inverse);
+}
+
+
+/* =========================================================
+   FOCUS
+   Unified accessibility focus treatment.
+   ========================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--theme-primary);
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-border-strong);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-text-muted);
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE LAYOUT TOKENS
+   ========================================================= */
+
+@media (min-width: 768px) {
+  :root {
+    --section-gap: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-gap: 4rem;
+  }
+}
+
+
+/* =========================================================
+   PERFORMANCE HELPERS
+   - content-visibility: enable skipping layout/paint for offscreen sections
+   - use with caution; set contain-intrinsic-size to avoid layout jumps.
+   ========================================================= */
+
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 280px; /* adjust per component shape */
+}
+
+/* Prefer GPU compositing for transform animations on interactive elements */
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Avoid heavy backdrop-blur for large overlays on low-end devices.
+   Use .prefer-no-backdrop to switch blur -> solid translucent bg */
+@media (prefers-reduced-motion: reduce), (max-device-width: 480px) {
+  .prefer-no-backdrop {
+    backdrop-filter: none !important;
+    background-color: rgba(0,0,0,0.36) !important;
+  }
+}
+
+/* Scroll lock helper (used by sheet/modal components)
+   Technique: lock body in place without removing from flow abruptly.
+*/
+body.scroll-lock {
+  position: fixed;
+  width: 100%;
+}
+body.scroll-lock > * {
+  /* preserve layout if necessary */
+}
+
+/* Limit expensive backdrop-filter usage globally (developer note):
+   Use class .use-blur on small overlays (headers, buttons).
+*/
+.backdrop-blur-lite {
+  backdrop-filter: blur(6px);
+     }
+
+/* Force small interactive elements to GPU layer for smooth transforms */
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Small hover translate for product card (GPU friendly) */
+.card-hover-lift {
+  transition: transform 160ms var(--ease-emphasized), box-shadow 180ms var(--ease-emphasized);
+}
+.card-hover-lift:hover {
+  transform: translate3d(0, -4px, 0);
+}
+
+/* Ensure long lists do not use will-change globally */
+* {
+  will-change: auto;
+     }
+
+/* ================= PERFORMANCE HELPERS ================= */
+
+/* Allow offscreen sections to skip layout/paint until needed */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 280px; /* اضبط حسب ارتفاع البطاقة */
+}
+
+/* Use GPU compositing for interactive transforms sparingly */
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Small hover lift that is compositor-friendly */
+.card-hover-lift {
+  transition: transform 160ms var(--ease-emphasized), box-shadow 180ms var(--ease-emphasized);
+}
+.card-hover-lift:hover {
+  transform: translate3d(0, -4px, 0);
+}
+
+/* Avoid using backdrop-filter on big elements globally; provide helper class for small overlays */
+.prefer-no-backdrop {
+  backdrop-filter: none !important;
+}
+
+/* Ensure any custom listeners don't block main thread: default touch action */
+html, body, #root, main {
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+}
+
+/* Reset will-change to avoid accidental wide usage */
+* {
+  will-change: auto;
+   }
+
+/* =========================================================
+   HERO CURVE — انحناء أعلى المحتوى (تحت الهيدر)
+   اللوح العلوي مستقيم، والحواف السفلية منحنية للداخل
+   ========================================================= */
+
+.hero-curved {
+  position: relative;
+  background: var(--theme-background);
+  border-bottom-left-radius: var(--hero-curve-height);
+  border-bottom-right-radius: var(--hero-curve-height);
+  overflow: hidden;
+}
+
+/* طبقة تعزز الانحناء بصريًا بمزج خفيف مع خلفية الصفحة */
+.hero-curved::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--hero-curve-height) / 2);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--theme-background) 92%, transparent)
   );
-}
+  pointer-events: none;
+    }
