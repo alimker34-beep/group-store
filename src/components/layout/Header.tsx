@@ -84,7 +84,7 @@ export function Header({
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-[var(--z-header)] bg-background">
+    <header className="header-curved sticky top-0 z-[var(--z-header)] bg-[color:var(--header-surface)]">
       <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--content-max-width)] items-center justify-between px-3.5 sm:px-4">
         {/* =====================================================
             [1] الأزرار (الثيم + الإشعارات) — يمين
