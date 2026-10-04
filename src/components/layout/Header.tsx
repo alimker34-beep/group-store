@@ -71,22 +71,6 @@ function BellIcon() {
   );
 }
 
-function ChevronLeftIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="size-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m15 18-6-6 6-6" />
-    </svg>
-  );
-}
-
 /* =========================================================
    HEADER
    ========================================================= */
@@ -136,62 +120,57 @@ export function Header({
         </div>
 
         {/* =====================================================
-            [2] كبسولة "قصتي" — يسار
+            [2] قصتي — Story مستقلة
             ===================================================== */}
         <button
           type="button"
           onClick={onProfileClick}
           aria-label="عرض قصة المتجر"
-          className={[
-            "group relative flex items-center gap-2",
-            "h-10 rounded-full pl-1 pr-3",
-            "border border-border/70 bg-surface/90",
-            "shadow-[0_2px_12px_rgba(0,0,0,0.05)]",
-            "backdrop-blur-md",
-            "transition-all duration-300",
-            "hover:border-border hover:bg-surface hover:shadow-[0_4px_18px_rgba(0,0,0,0.08)]",
-            "active:scale-[0.97]",
-          ].join(" ")}
+          className="group flex flex-col items-center gap-1.5 outline-none"
         >
-          {/* حلقة متدرجة حول الصورة */}
+          {/* Story Ring */}
           <span
-            aria-hidden
             className={[
-              "relative flex size-8 items-center justify-center rounded-full",
-              "bg-[conic-gradient(from_140deg,var(--theme-primary),var(--theme-danger),var(--theme-warning),var(--theme-primary))]",
+              "relative flex size-[46px] items-center justify-center rounded-full",
+              "bg-[conic-gradient(from_210deg,var(--theme-info),#38bdf8,var(--theme-primary),var(--theme-info))]",
               "p-[2px]",
+              "transition-transform duration-300",
+              "group-hover:scale-[1.04]",
+              "group-active:scale-95",
             ].join(" ")}
           >
-            {/* حد فاصل رقيق يفصل الحلقة عن الصورة */}
-            <span className="flex size-full items-center justify-center rounded-full bg-surface p-[1.5px]">
+            {/* نبضة خفيفة جداً حول الإطار */}
+            <span
+              aria-hidden
+              className={[
+                "absolute inset-0 rounded-full",
+                "bg-[conic-gradient(from_210deg,var(--theme-info),#38bdf8,var(--theme-primary),var(--theme-info))]",
+                "opacity-0",
+                "group-hover:opacity-30",
+                "group-hover:animate-pulse",
+              ].join(" ")}
+            />
+
+            {/* فاصل الإطار عن الصورة */}
+            <span className="relative flex size-full items-center justify-center rounded-full bg-background p-[2px]">
               <span className="size-full overflow-hidden rounded-full">
                 <ResponsiveImage
                   src={avatarUrl}
                   alt="قصة المتجر"
                   priority={true}
                   decoding="async"
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </span>
             </span>
           </span>
 
-          {/* النص */}
-          <span className="flex flex-col items-start leading-none">
-            <span className="text-[10px] font-medium text-muted">
-              جديد
-            </span>
-            <span className="mt-0.5 text-xs font-semibold text-foreground">
-              قصتي
-            </span>
-          </span>
-
-          {/* سهم الانتقال */}
-          <span className="text-muted transition-transform duration-300 group-hover:-translate-x-0.5">
-            <ChevronLeftIcon />
+          {/* اسم القصة */}
+          <span className="text-[11px] font-semibold leading-none text-foreground">
+            قصتي
           </span>
         </button>
       </div>
     </header>
   );
-              }
+    }
