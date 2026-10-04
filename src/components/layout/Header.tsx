@@ -84,7 +84,8 @@ export function Header({
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-[var(--z-header)] bg-[var(--header-surface)] pt-3 pb-8 px-4">
+    /* تم استبدال bg-[var(--header-surface)] بـ bg-transparent وإزالة sticky */
+    <header className="w-full bg-transparent pt-3 pb-8 px-4">
       <div className="mx-auto flex h-14 max-w-[var(--content-max-width)] items-center justify-between">
         {/* =====================================================
             [1] الأزرار (الثيم + الإشعارات) — يمين
@@ -171,4 +172,4 @@ export function Header({
       </div>
     </header>
   );
-      }
+            }
