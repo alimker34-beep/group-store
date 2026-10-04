@@ -120,7 +120,7 @@ export function Header({
         </div>
 
         {/* =====================================================
-            [2] قصتي — Story + Capsule (معكوسة + ألوان فاخرة)
+            [2] القصة فقط (بدون كبسولة) — بحجم أكبر
             ===================================================== */}
         <div className="flex translate-y-1.5 items-center">
           <button
@@ -129,39 +129,13 @@ export function Header({
             aria-label="عرض قصة المتجر"
             className="group flex items-center outline-none"
           >
-            {/* Story Capsule — أصبحت أولاً (على اليسار) */}
+            {/* Story — تم تكبيرها إلى 52px */}
             <span
               className={[
-                "mr-[-4px] flex h-8 items-center rounded-full",
-                "border border-amber-200/70 dark:border-amber-900/60",
-                "bg-amber-50/90 dark:bg-amber-950/50",
-                "px-3.5",
-                "shadow-[0_2px_8px_rgba(245,158,11,0.08)]",
-                "transition-all duration-200",
-                "group-hover:border-amber-300",
-                "group-hover:bg-amber-100/90",
-                "dark:group-hover:border-amber-800",
-                "dark:group-hover:bg-amber-950/70",
-              ].join(" ")}
-            >
-              <span
-                className={[
-                  "text-[11px] font-bold tracking-wide",
-                  "bg-[linear-gradient(90deg,#d97706,#b45309)]",
-                  "bg-clip-text text-transparent",
-                ].join(" ")}
-              >
-                قصتي
-              </span>
-            </span>
-
-            {/* Story */}
-            <span
-              className={[
-                "relative flex size-[46px] shrink-0 items-center justify-center rounded-full",
-                "bg-[conic-gradient(from_180deg,#f59e0b,#d97706,#b45309,#f59e0b)]",
+                "relative flex size-[52px] shrink-0 items-center justify-center rounded-full",
+                "bg-[conic-gradient(from_180deg,#e0f2fe,#bae6fd,#7dd3fc,#e0f2fe)]",
                 "p-[2px]",
-                "shadow-[0_0_0_1px_rgba(245,158,11,0.08)]",
+                "shadow-[0_0_0_1px_rgba(186,230,253,0.15)]",
                 "transition-transform duration-200",
                 "group-hover:scale-[1.03]",
                 "group-active:scale-95",
@@ -172,7 +146,7 @@ export function Header({
                 aria-hidden
                 className={[
                   "absolute -inset-[2px] rounded-full",
-                  "border border-amber-400/20",
+                  "border border-sky-200/30",
                   "opacity-0",
                   "group-hover:opacity-100",
                   "transition-opacity duration-300",
