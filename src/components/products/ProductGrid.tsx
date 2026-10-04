@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { ProductCard, type Product } from "./ProductCard";
 import { ProductDetailsSheet } from "./ProductDetailsSheet";
 import { getMockProducts } from "./mockProducts";
+
+const PAGE_SIZE = 15;
 
 interface ProductGridProps {
   products?: Product[];
@@ -36,8 +38,6 @@ export function ProductGrid({
   onToggleFavorite,
 }: ProductGridProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
-  const PAGE_SIZE = 15;
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const items = products ?? getMockProducts();
@@ -60,7 +60,10 @@ export function ProductGrid({
         className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-9"
       >
         {visibleItems.map((product, idx) => (
-          <div key={product.id} className="min-w-0">
+          <div
+            key={product.id}
+            className="min-w-0 content-auto"
+          >
             <ProductCard
               product={product}
               inCart={isInCart?.(product.id) ?? false}
@@ -79,9 +82,13 @@ export function ProductGrid({
         <div className="mt-6 flex items-center justify-center">
           <button
             type="button"
-            onClick={() =>
-              setVisibleCount(v => Math.min(items.length, v + PAGE_SIZE))
-            }
+            onClick={() => {
+              startTransition(() => {
+                setVisibleCount(v =>
+                  Math.min(items.length, v + PAGE_SIZE),
+                );
+              });
+            }}
             className="rounded-md bg-primary px-4 py-2 text-inverse shadow-sm"
           >
             تحميل المزيد
@@ -99,4 +106,4 @@ export function ProductGrid({
       />
     </>
   );
-                              }
+}
