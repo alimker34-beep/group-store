@@ -531,7 +531,7 @@ html, body, #root, main {
 
 /* =========================================================
    HEADER CURVE — الانحناء المعكوس أسفل الهيدر
-   الحد السفلي مستقيم، والزوايا فقط منحنية للداخل
+   الحد السفلي مستقيم، والزوايا فقط منحنية للخارج (معكوسة)
    ========================================================= */
 
 .header-curved {
@@ -546,10 +546,10 @@ html, body, #root, main {
   bottom: calc(var(--header-curve-height) * -1);
   height: var(--header-curve-height);
   background: var(--header-surface);
-  border-bottom-left-radius: var(--header-curve-height)
+  border-top-left-radius: var(--header-curve-height)
     var(--header-curve-height);
-  border-bottom-right-radius: var(--header-curve-height)
+  border-top-right-radius: var(--header-curve-height)
     var(--header-curve-height);
   pointer-events: none;
   z-index: -1;
-     }
+   }
