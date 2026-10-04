@@ -48,56 +48,48 @@ export default function HomePage({
         className="mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-4 md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
         style={{ contain: "layout style" }}
       >
-        {/* =====================================================
-            [الانحناء الاحترافي] — يبدأ من هنا
-            ===================================================== */}
-        <div className="relative -mx-[var(--page-padding-mobile)] -mt-4 rounded-t-[2.5rem] bg-background pt-4 md:-mx-[var(--page-padding-tablet)] lg:-mx-[var(--page-padding-desktop)]">
-          <div className="mb-6">
-            <p className="text-sm font-medium text-muted">اكتشف الجديد</p>
+        <div className="mb-6">
+          <p className="text-sm font-medium text-muted">اكتشف الجديد</p>
 
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-              منتجات تستحق أن تراها
-            </h1>
-          </div>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+            منتجات تستحق أن تراها
+          </h1>
+        </div>
 
-          <section className="mb-8" style={{ contain: "layout paint" }}>
-            <PromoBanner
-              title="خصم اليوم فقط"
-              subtitle="اكتشف تشكيلتنا الجديدة واحصل على عروض مميزة."
-              buttonLabel="تصفح العرض"
-            />
-          </section>
+        <section className="mb-8" style={{ contain: "layout paint" }}>
+          <PromoBanner
+            title="خصم اليوم فقط"
+            subtitle="اكتشف تشكيلتنا الجديدة واحصل على عروض مميزة."
+            buttonLabel="تصفح العرض"
+          />
+        </section>
 
-          <section style={{ contain: "layout" }}>
-            <div className="mb-4 flex items-end justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted">مختاراتنا</p>
+        <section style={{ contain: "layout" }}>
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <p className="text-xs font-medium text-muted">مختاراتنا</p>
 
-                <h2 className="mt-1 text-xl font-semibold text-foreground">
-                  الأكثر طلبًا
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                className="text-sm font-medium text-muted transition-[color] duration-[var(--motion-normal)] hover:text-foreground"
-              >
-                عرض الكل
-              </button>
+              <h2 className="mt-1 text-xl font-semibold text-foreground">
+                الأكثر طلبًا
+              </h2>
             </div>
 
-            <ProductGrid
-              isInCart={isInCart}
-              isFavorite={(id) => favorites.includes(id)}
-              onQuickAdd={onAddToCart}
-              onRemoveFromCart={onRemoveFromCart}
-              onToggleFavorite={onToggleFavorite}
-            />
-          </section>
-        </div>
-        {/* =====================================================
-            [نهاية الانحناء الاحترافي]
-            ===================================================== */}
+            <button
+              type="button"
+              className="text-sm font-medium text-muted transition-[color] duration-[var(--motion-normal)] hover:text-foreground"
+            >
+              عرض الكل
+            </button>
+          </div>
+
+          <ProductGrid
+            isInCart={isInCart}
+            isFavorite={(id) => favorites.includes(id)}
+            onQuickAdd={onAddToCart}
+            onRemoveFromCart={onRemoveFromCart}
+            onToggleFavorite={onToggleFavorite}
+          />
+        </section>
       </div>
 
       <BottomNav
@@ -114,4 +106,4 @@ export default function HomePage({
       />
     </main>
   );
-  }
+}
