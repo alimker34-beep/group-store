@@ -84,7 +84,7 @@ export function Header({
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-[var(--z-header)] bg-background/88 transition-colors duration-300 will-change-transform">
+    <header className="sticky top-0 z-[var(--z-header)] bg-background border-b border-border shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_14px_rgba(0,0,0,0.035)]">
       <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--content-max-width)] items-center justify-between px-3.5 sm:px-4">
         {/* =====================================================
             [1] الأزرار (الثيم + الإشعارات) — يمين
@@ -120,57 +120,81 @@ export function Header({
         </div>
 
         {/* =====================================================
-            [2] قصتي — Story مستقلة
+            [2] قصتي — Story + Capsule
             ===================================================== */}
-        <button
-          type="button"
-          onClick={onProfileClick}
-          aria-label="عرض قصة المتجر"
-          className="group flex flex-col items-center gap-1.5 outline-none"
-        >
-          {/* Story Ring */}
-          <span
-            className={[
-              "relative flex size-[46px] items-center justify-center rounded-full",
-              "bg-[conic-gradient(from_210deg,var(--theme-info),#38bdf8,var(--theme-primary),var(--theme-info))]",
-              "p-[2px]",
-              "transition-transform duration-300",
-              "group-hover:scale-[1.04]",
-              "group-active:scale-95",
-            ].join(" ")}
+        <div className="flex translate-y-1.5 items-center">
+          <button
+            type="button"
+            onClick={onProfileClick}
+            aria-label="عرض قصة المتجر"
+            className="group flex items-center outline-none"
           >
-            {/* نبضة خفيفة جداً حول الإطار */}
+            {/* Story */}
             <span
-              aria-hidden
               className={[
-                "absolute inset-0 rounded-full",
-                "bg-[conic-gradient(from_210deg,var(--theme-info),#38bdf8,var(--theme-primary),var(--theme-info))]",
-                "opacity-0",
-                "group-hover:opacity-30",
-                "group-hover:animate-pulse",
+                "relative flex size-[46px] shrink-0 items-center justify-center rounded-full",
+                "bg-[conic-gradient(from_180deg,#38bdf8,#60a5fa,#818cf8,#38bdf8)]",
+                "p-[2px]",
+                "shadow-[0_0_0_1px_rgba(56,189,248,0.08)]",
+                "transition-transform duration-200",
+                "group-hover:scale-[1.03]",
+                "group-active:scale-95",
               ].join(" ")}
-            />
+            >
+              {/* Outer soft pulse */}
+              <span
+                aria-hidden
+                className={[
+                  "absolute -inset-[2px] rounded-full",
+                  "border border-sky-400/20",
+                  "opacity-0",
+                  "group-hover:opacity-100",
+                  "transition-opacity duration-300",
+                ].join(" ")}
+              />
 
-            {/* فاصل الإطار عن الصورة */}
-            <span className="relative flex size-full items-center justify-center rounded-full bg-background p-[2px]">
-              <span className="size-full overflow-hidden rounded-full">
-                <ResponsiveImage
-                  src={avatarUrl}
-                  alt="قصة المتجر"
-                  priority={true}
-                  decoding="async"
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+              {/* Image */}
+              <span className="relative flex size-full items-center justify-center rounded-full bg-background p-[2px]">
+                <span className="size-full overflow-hidden rounded-full">
+                  <ResponsiveImage
+                    src={avatarUrl}
+                    alt="قصة المتجر"
+                    priority={true}
+                    decoding="async"
+                    className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </span>
               </span>
             </span>
-          </span>
 
-          {/* اسم القصة */}
-          <span className="text-[11px] font-semibold leading-none text-foreground">
-            قصتي
-          </span>
-        </button>
+            {/* Story Capsule */}
+            <span
+              className={[
+                "-ml-1 flex h-8 items-center rounded-full",
+                "border border-sky-200/70 dark:border-sky-900/60",
+                "bg-sky-50/90 dark:bg-sky-950/50",
+                "px-3.5",
+                "shadow-[0_2px_8px_rgba(56,189,248,0.08)]",
+                "transition-all duration-200",
+                "group-hover:border-sky-300",
+                "group-hover:bg-sky-100/90",
+                "dark:group-hover:border-sky-800",
+                "dark:group-hover:bg-sky-950/70",
+              ].join(" ")}
+            >
+              <span
+                className={[
+                  "text-[11px] font-bold tracking-wide",
+                  "bg-[linear-gradient(90deg,#0ea5e9,#6366f1)]",
+                  "bg-clip-text text-transparent",
+                ].join(" ")}
+              >
+                قصتي
+              </span>
+            </span>
+          </button>
+        </div>
       </div>
     </header>
   );
-    }
+              }
