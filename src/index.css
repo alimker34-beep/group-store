@@ -125,6 +125,9 @@
      ======================================================= */
 
   --header-height: 4rem;
+  --header-curve-height: 32px;
+  --header-curve-radius: 100% 100% 0 0 / 100% 100% 0 0;
+  --header-surface: #111111;
   --bottom-nav-height: 4.5rem;
 
   /* =======================================================
@@ -524,4 +527,26 @@ html, body, #root, main {
 /* Reset will-change to avoid accidental wide usage */
 * {
   will-change: auto;
+   }
+
+/* =========================================================
+   HEADER CURVE — الانحناء المعكوس أسفل الهيدر
+   ========================================================= */
+
+.header-curved {
+  position: relative;
+}
+
+.header-curved::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--header-curve-height) * -1);
+  height: var(--header-curve-height);
+  background: var(--header-surface);
+  border-bottom-left-radius: 50% 100%;
+  border-bottom-right-radius: 50% 100%;
+  pointer-events: none;
+  z-index: -1;
    }
