@@ -529,30 +529,13 @@ html, body, #root, main {
    }
 
 /* =========================================================
-   HERO CURVE — انحناء أعلى المحتوى (تحت الهيدر)
-   اللوح العلوي مستقيم، والحواف السفلية منحنية للداخل
+   APP CONTENT CARD — الانحناء العلوي المقوس الداخلي
    ========================================================= */
 
-.hero-curved {
+.app-content-card {
+  background-color: var(--theme-background);
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
   position: relative;
-  background: var(--theme-background);
-  border-bottom-left-radius: var(--hero-curve-height);
-  border-bottom-right-radius: var(--hero-curve-height);
-  overflow: hidden;
-}
-
-/* طبقة تعزز الانحناء بصريًا بمزج خفيف مع خلفية الصفحة */
-.hero-curved::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(var(--hero-curve-height) / 2);
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    color-mix(in srgb, var(--theme-background) 92%, transparent)
-  );
-  pointer-events: none;
+  z-index: 10;
    }
