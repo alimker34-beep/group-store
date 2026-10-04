@@ -84,8 +84,8 @@ export function Header({
   onNotificationsClick,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-[var(--z-header)] bg-[color:var(--header-surface)]">
-      <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--content-max-width)] items-center justify-between px-3.5 sm:px-4">
+    <header className="sticky top-0 z-[var(--z-header)] bg-[var(--header-surface)] pt-2 pb-6 px-4">
+      <div className="mx-auto flex h-14 max-w-[var(--content-max-width)] items-center justify-between">
         {/* =====================================================
             [1] الأزرار (الثيم + الإشعارات) — يمين
             ===================================================== */}
@@ -171,4 +171,4 @@ export function Header({
       </div>
     </header>
   );
-              }
+          }
