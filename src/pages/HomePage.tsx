@@ -44,21 +44,14 @@ export default function HomePage({
         onCartClick={() => onNavigate("/checkout")}
       />
 
-      {/* 
-        =====================================================
-        [تعديل احترافي]: إضافة الانحناء والطفو للمحتوى
-        - rounded-t-[2.5rem]: انحناء علوي ناعم (40px)
-        - -mt-6: سحب المحتوى للأعلى ليتداخل مع الخلفية
-        - shadow-[0_-4px_20px_rgba(0,0,0,0.03)]: ظل علوي خفيف جداً للطفو
-        - bg-background: لضمان تغطية الخلفية خلف الانحناء
-        =====================================================
-      */}
       <div
-        className="relative z-10 mx-auto -mt-6 w-full max-w-[var(--content-max-width)] rounded-t-[2.5rem] bg-background pb-[calc(var(--bottom-nav-height)+2rem)] pt-6 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
+        className="mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-4 md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
         style={{ contain: "layout style" }}
       >
-        {/* تم نقل الـ px الخاصة بالموبايل إلى هنا لتناسب الانحناء */}
-        <div className="px-[var(--page-padding-mobile)] md:px-0">
+        {/* =====================================================
+            [الانحناء الاحترافي] — يبدأ من هنا
+            ===================================================== */}
+        <div className="relative -mx-[var(--page-padding-mobile)] -mt-4 rounded-t-[2.5rem] bg-background pt-4 md:-mx-[var(--page-padding-tablet)] lg:-mx-[var(--page-padding-desktop)]">
           <div className="mb-6">
             <p className="text-sm font-medium text-muted">اكتشف الجديد</p>
 
@@ -102,6 +95,9 @@ export default function HomePage({
             />
           </section>
         </div>
+        {/* =====================================================
+            [نهاية الانحناء الاحترافي]
+            ===================================================== */}
       </div>
 
       <BottomNav
@@ -118,4 +114,4 @@ export default function HomePage({
       />
     </main>
   );
-        }
+  }
