@@ -1,74 +1,29 @@
-import { Button } from "../ui/Button";
 import ResponsiveImage from "../ui/ResponsiveImage";
 
 interface PromoBannerProps {
-  title?: string;
-  subtitle?: string;
-  buttonLabel?: string;
   imageUrl?: string;
-  badgeText?: string;
-  onAction?: () => void;
 }
 
 export function PromoBanner({
-  title = "خصم 50% على الجاكيتات",
-  subtitle = "لفترة محدودة فقط - استمتع بأفضل العروض الشتوية",
-  buttonLabel = "تصفح العرض",
-  badgeText = "اليوم فقط",
   imageUrl =
     "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=900&q=75&fm=webp",
-  onAction,
 }: PromoBannerProps) {
   return (
-    <section className="relative min-h-[220px] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-neutral-900 shadow-xl sm:min-h-[260px] content-auto">
-      {/* 1. خلفية الصورة الممتدة بالكامل باحترافية */}
-      <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
+    <section className="relative min-h-[220px] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-black shadow-xl sm:min-h-[260px]">
+      {/* خلفية الصورة الممتدة بالكامل */}
+      <div className="absolute inset-0 z-0 h-full w-full overflow-hidden [contain:paint]">
         <ResponsiveImage
           src={imageUrl}
-          alt={title}
+          alt=""
           priority
           sizes="(max-width: 640px) 100vw, 1280px"
           decoding="async"
-          className="h-full w-full object-cover object-center"
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
 
-        {/* 2. طبقات التدرج الضوئي لتأمين تباين النصوص بالكامل (Dark Overlay with Directional Gradient) */}
+        {/* طبقة التدرج الضوئي الوحيدة لتأمين التباين */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-transparent dir-rtl:bg-gradient-to-l" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-      </div>
-
-      {/* 3. حاوية المحتوى الذكية بداخل مساحة احترافية */}
-      <div className="relative z-10 flex h-full min-h-[220px] max-w-[85%] flex-col justify-center px-6 py-6 sm:min-h-[260px] sm:max-w-[65%] sm:px-10 sm:py-8 md:max-w-[55%]">
-        {/* الشارة العلوية متكيفة التباين */}
-        {badgeText && (
-          <span className="mb-2 inline-flex w-fit items-center rounded-full border border-white/20 bg-black/35 px-3 py-1 text-[11px] font-semibold text-white shadow-sm">
-            {badgeText}
-          </span>
-        )}
-
-        {/* 4. معالجة العنوان وحجم النص للوقاية من التشوّه (Text Clamping & Adaptive Drop Shadows) */}
-        <h2 className="line-clamp-2 text-xl font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] sm:text-2xl md:text-3xl [text-shadow:_0_1px_12px_rgba(0,0,0,0.6)]">
-          {title}
-        </h2>
-
-        {/* النص الفرعي */}
-        {subtitle && (
-          <p className="mt-2 line-clamp-2 text-xs font-medium text-gray-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] sm:text-sm">
-            {subtitle}
-          </p>
-        )}
-
-        {/* 5. الزر الزجاجي الذكي التكيّفي (Adaptive Glassmorphic Button) */}
-        <div className="mt-5">
-          <Button
-            size="sm"
-            onClick={onAction}
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/30 bg-black/40 px-6 py-2.5 text-xs font-semibold text-white shadow-lg transition-[background-color,border-color,color,transform] duration-200 hover:border-white hover:bg-white hover:text-black active:scale-95 sm:text-sm"
-          >
-            {buttonLabel}
-          </Button>
-        </div>
       </div>
     </section>
   );
-        }
+}
