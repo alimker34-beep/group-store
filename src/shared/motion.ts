@@ -1,16 +1,14 @@
 /* =========================================================
    MOTION — قيم موحّدة لكل أنيميشنات المشروع
-   - مصمّم لتكون compositor-friendly (transform, opacity).
-   - يحترم prefers-reduced-motion ويقلّل التوقيتات.
    ========================================================= */
 
 export const MOTION = {
   /* Durations (seconds — Framer Motion uses seconds) */
-  fast: 0.14,
-  normal: 0.22,
-  smooth: 0.34,
-  slow: 0.48,
-  page: 0.42,
+  fast: 0.12,
+  normal: 0.18,
+  smooth: 0.28,
+  slow: 0.4,
+  page: 0.34,
 } as const;
 
 /* Easing tuned for compositor-friendly feel (use transform + opacity) */
@@ -48,8 +46,7 @@ export const TRANSITION = {
   page: transitionFor("page"),
 } as const;
 
-/* VARIANTS — keep transforms (translate/scale) and opacity only.
-   Use translate3d / numeric transforms where possible (compositor-friendly). */
+/* VARIANTS — keep transforms (translate/scale) and opacity only. */
 export const VARIANTS = {
   fadeIn: {
     initial: { opacity: 0 },
@@ -57,10 +54,10 @@ export const VARIANTS = {
     exit: { opacity: 0 },
   },
 
-  sheetUp: {
-    initial: { y: "100%", opacity: 0.85 },
-    animate: { y: "0%", opacity: 1 },
-    exit: { y: "100%", opacity: 0.9 },
+  sheetFade: {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
   },
 
   riseUp: {
@@ -85,4 +82,4 @@ export const VARIANTS = {
 /* Export helper — components can call to quickly check reduced-motion. */
 export function isReducedMotion() {
   return prefersReducedMotion();
-}
+       }
