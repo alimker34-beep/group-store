@@ -33,7 +33,7 @@ export default function HomePage({
   const showFloating = cartCount > 0;
 
   return (
-    <main className="min-h-[100dvh] bg-[#111111]">
+    <main className="min-h-[100dvh] bg-[#f0f2f5]">
       <Header
         storeName="GROUP STORE"
         notificationCount={2}
