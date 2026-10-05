@@ -5,7 +5,7 @@
 export const MOTION = {
   /* Durations (seconds — Framer Motion uses seconds) */
   fast: 0.12,
-  normal: 0.18,
+  normal: 0.22,
   smooth: 0.28,
   slow: 0.4,
   page: 0.34,
@@ -82,4 +82,4 @@ export const VARIANTS = {
 /* Export helper — components can call to quickly check reduced-motion. */
 export function isReducedMotion() {
   return prefersReducedMotion();
-       }
+     }
