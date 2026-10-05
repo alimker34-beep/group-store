@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Header } from "../components/layout/Header";
 import { BottomNav } from "../components/layout/BottomNav";
@@ -65,32 +65,24 @@ export default function FavoritesPage({
   /**
    * الفلترة:
    * 1. نجمع المنتجات التي مُعرّفاتها في favorites.
-   * 2. أي ID غير موجود في allProducts → يُحذف تلقائيًا.
+   * 2. أي ID غير موجود في allProducts → يُحذف تلقائيًا عبر useEffect.
    */
   const favoriteProducts = useMemo(() => {
     const map = new Map(allProducts.map((p) => [p.id, p]));
 
-    const valid: Product[] = [];
-    const stale: string[] = [];
+    return favoriteIds
+      .map((id) => map.get(id))
+      .filter((product): product is Product => Boolean(product));
+  }, [favoriteIds, allProducts]);
+
+  useEffect(() => {
+    const validIds = new Set(allProducts.map((product) => product.id));
 
     favoriteIds.forEach((id) => {
-      const product = map.get(id);
-      if (product) {
-        valid.push(product);
-      } else {
-        stale.push(id);
+      if (!validIds.has(id)) {
+        onRemoveFavorite(id);
       }
     });
-
-    // تنظيف المفضلة من المعرّفات الميتة (بدون loop)
-    if (stale.length > 0) {
-      // تأجيل التنظيف للـ microtask لتفادي setState أثناء render
-      queueMicrotask(() => {
-        stale.forEach((id) => onRemoveFavorite(id));
-      });
-    }
-
-    return valid;
   }, [favoriteIds, allProducts, onRemoveFavorite]);
 
   return (
@@ -142,11 +134,10 @@ export default function FavoritesPage({
             dir="rtl"
             className="grid grid-cols-2 gap-x-3 gap-y-5 sm:gap-x-5 sm:gap-y-7"
           >
-            <AnimatePresence initial={false} mode="popLayout">
+            <AnimatePresence initial={false}>
               {favoriteProducts.map((product) => (
                 <motion.div
                   key={product.id}
-                  layout
                   initial={{ opacity: 0, y: 16, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
@@ -205,7 +196,7 @@ interface FavoriteTileProps {
 
 function FavoriteTile({ product, onOpen, onRemove }: FavoriteTileProps) {
   return (
-    <div className="group relative">
+    <div className="group relative content-auto">
       <button
         type="button"
         onClick={onOpen}
@@ -224,6 +215,7 @@ function FavoriteTile({ product, onOpen, onRemove }: FavoriteTileProps) {
             src={product.image}
             alt={product.name}
             loading="lazy"
+            decoding="async"
             draggable={false}
             className={[
               "absolute inset-0 h-full w-full object-cover object-center",
@@ -248,7 +240,7 @@ function FavoriteTile({ product, onOpen, onRemove }: FavoriteTileProps) {
         className={[
           "absolute left-2 top-2 z-20",
           "flex size-8 items-center justify-center rounded-full",
-          "border-0 bg-[color:var(--theme-surface)]/85 backdrop-blur-md",
+          "border-0 bg-[color:var(--theme-surface)]/85",
           "shadow-[var(--shadow-xs)] text-[color:var(--theme-text)]",
           "transition-transform duration-[var(--motion-normal)]",
           "ease-[var(--ease-emphasized)]",
@@ -268,4 +260,4 @@ function FavoriteTile({ product, onOpen, onRemove }: FavoriteTileProps) {
       </button>
     </div>
   );
-}
+      }
