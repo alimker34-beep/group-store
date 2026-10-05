@@ -6,15 +6,15 @@ export const MOTION = {
   /* Durations (seconds — Framer Motion uses seconds) */
   fast: 0.12,
   normal: 0.22,
-  smooth: 0.38,
+  smooth: 0.42,
   slow: 0.4,
   page: 0.34,
 } as const;
 
 /* Easing tuned for compositor-friendly feel (use transform + opacity) */
 export const EASING = {
-  emph: [0.25, 0.1, 0.25, 1] as const,
-  standard: [0.25, 0.1, 0.25, 1] as const,
+  emph: [0.16, 1, 0.3, 1] as const,      // easeOutExpo — تلاشي ناعم جدًا
+  standard: [0.2, 0, 0, 1] as const,     // easeOut
 } as const;
 
 /* TRANSITION factory that respects reduced-motion */
@@ -55,9 +55,9 @@ export const VARIANTS = {
   },
 
   sheetFade: {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-    exit: { opacity: 0 },
+    initial: { opacity: 0, scale: 0.985 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.99 },
   },
 
   riseUp: {
@@ -82,4 +82,4 @@ export const VARIANTS = {
 /* Export helper — components can call to quickly check reduced-motion. */
 export function isReducedMotion() {
   return prefersReducedMotion();
-}
+       }
