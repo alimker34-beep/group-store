@@ -66,12 +66,9 @@ export function CartSheet({
   return (
     <AnimatePresence>
       {open ? (
-        <motion.div
+        <div
           key="cart-sheet-root"
           className="fixed inset-0 z-[var(--z-modal)]"
-          initial="initial"
-          animate="animate"
-          exit="exit"
         >
           <motion.button
             type="button"
@@ -150,7 +147,7 @@ export function CartSheet({
           </div>
         ) : null}
       </motion.section>
-        </motion.div>
+        </div>
       ) : null}
     </AnimatePresence>
   );
@@ -237,7 +234,7 @@ function CartRow({
         type="button"
         aria-label={`حذف ${item.product.name}`}
         onClick={onRemove}
-        className="absolute left-3 top-3 flex size-6 items-center justify-center rounded-full border border-border bg-surface text-muted transition-all duration-[var(--motion-normal)] hover:border-danger hover:bg-danger-soft hover:text-danger active:scale-90"
+        className="absolute left-3 top-2 flex size-6 items-center justify-center rounded-full border border-border bg-surface text-muted transition-all duration-[var(--motion-normal)] hover:border-danger hover:bg-danger-soft hover:text-danger active:scale-90"
       >
         <svg
           viewBox="0 0 24 24"
@@ -252,4 +249,4 @@ function CartRow({
       </button>
     </article>
   );
-        }
+      }
