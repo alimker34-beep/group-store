@@ -66,8 +66,11 @@ export function CartSheet({
   return (
     <AnimatePresence initial={false}>
       {open ? (
-        <div
+        <motion.div
           key="cart-sheet-root"
+          initial="initial"
+          animate="animate"
+          exit="exit"
           className="fixed inset-0 z-[var(--z-modal)]"
         >
           <motion.button
@@ -148,7 +151,7 @@ export function CartSheet({
           </div>
         ) : null}
       </motion.section>
-        </div>
+        </motion.div>
       ) : null}
     </AnimatePresence>
   );
