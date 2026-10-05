@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { IconButton } from "../ui/IconButton";
-import { MOTION, TRANSITION, VARIANTS } from "../../shared/motion";
+import { TRANSITION, VARIANTS } from "../../shared/motion";
 import type { CartItem } from "./types";
 
 interface CartSheetProps {
@@ -84,8 +84,8 @@ export function CartSheet({
 
           <motion.section
             dir="rtl"
-            variants={VARIANTS.sheetUp}
-            transition={{ duration: MOTION.smooth, ease: MOTION.ease }}
+            variants={VARIANTS.sheetFade}
+            transition={TRANSITION.normal}
             className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-4 sm:rounded-[var(--radius-2xl)]"
           >
         {/* Header */}
@@ -115,10 +115,11 @@ export function CartSheet({
                 {items.map((item) => (
                   <motion.div
                     key={item.key}
-                    initial={{ opacity: 0, y: 10, scale: 0.99 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: 20, scale: 0.98 }}
-                    transition={TRANSITION.normal}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    variants={VARIANTS.fadeIn}
+                    transition={TRANSITION.fast}
                   >
                     <CartRow
                       item={item}
@@ -251,4 +252,4 @@ function CartRow({
       </button>
     </article>
   );
-            }
+        }
