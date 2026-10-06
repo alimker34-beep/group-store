@@ -30,10 +30,9 @@ function prefersReducedMotion(): boolean {
 }
 
 export function transitionFor(key: keyof typeof MOTION) {
-  const reduced = prefersReducedMotion();
   const base = MOTION[key];
   return {
-    duration: reduced ? Math.min(0.08, base) : base,
+    duration: base,
     ease: EASING.emph,
   };
 }
@@ -86,4 +85,4 @@ export const VARIANTS = {
 /* Export helper — components can call to quickly check reduced-motion. */
 export function isReducedMotion() {
   return prefersReducedMotion();
-                              }
+}
