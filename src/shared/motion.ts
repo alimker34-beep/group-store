@@ -6,14 +6,14 @@ export const MOTION = {
   /* Durations (seconds — Framer Motion uses seconds) */
   fast: 0.12,
   normal: 0.22,
-  smooth: 0.55,
-  slow: 0.5,
+  smooth: 0.42,
+  slow: 0.4,
   page: 0.34,
 } as const;
 
 /* Easing tuned for compositor-friendly feel (use transform + opacity) */
 export const EASING = {
-  emph: [0.22, 1, 0.36, 1] as const,     // easeOutQuint — ناعم وواضح
+  emph: [0.16, 1, 0.3, 1] as const,      // easeOutExpo — تلاشي ناعم جدًا
   standard: [0.2, 0, 0, 1] as const,     // easeOut
 } as const;
 
@@ -54,11 +54,14 @@ export const VARIANTS = {
     exit: { opacity: 0 },
   },
 
-  /* ظهور الكرت — تلاشي واضح + انزلاق خفيف للأعلى + تكبير طفيف */
   sheetFade: {
-    initial: { opacity: 0, y: 28, scale: 0.96 },
-    animate: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 16, scale: 0.97 },
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.1, 0.25, 1],
+    },
   },
 
   riseUp: {
@@ -83,4 +86,4 @@ export const VARIANTS = {
 /* Export helper — components can call to quickly check reduced-motion. */
 export function isReducedMotion() {
   return prefersReducedMotion();
-}
+                              }
