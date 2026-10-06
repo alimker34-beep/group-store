@@ -340,7 +340,7 @@ function App() {
      --------------------------------------------- */
   return (
     <>
-      <AnimatePresence initial={false}>
+      <AnimatePresence initial={false} mode="sync">
         <motion.div
           key={routeKey}
           initial={{ opacity: 0 }}
@@ -348,8 +348,8 @@ function App() {
           exit={{ opacity: 0 }}
           transition={{
             opacity: {
-              duration: 0.32,
-              ease: [0.22, 1, 0.36, 1],
+              duration: 0.42,
+              ease: [0.4, 0, 0.2, 1],
             },
           }}
         >
