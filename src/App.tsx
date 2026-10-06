@@ -343,19 +343,12 @@ function App() {
       <AnimatePresence initial={false} mode="sync">
         <motion.div
           key={routeKey}
-          initial={{ opacity: 0, y: 6 }}
+          initial={{ opacity: 0 }}
           animate={{
             opacity: 1,
-            y: 0,
             transition: {
-              opacity: {
-                duration: 0.55,
-                ease: [0.16, 1, 0.3, 1],
-              },
-              y: {
-                duration: 0.55,
-                ease: [0.16, 1, 0.3, 1],
-              },
+              duration: 0.48,
+              ease: [0.22, 1, 0.36, 1],
             },
           }}
         >
