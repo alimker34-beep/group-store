@@ -74,15 +74,29 @@ export function CartSheet({
             type="button"
             aria-label="إغلاق السلة"
             onClick={onClose}
-            variants={VARIANTS.fadeIn}
-            transition={TRANSITION.slow}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              opacity: {
+                duration: 1.2,
+                ease: [0.4, 0, 0.2, 1],
+              },
+            }}
             className="absolute inset-0 bg-black/40 prefer-no-backdrop"
           />
 
           <motion.section
             dir="rtl"
-            variants={VARIANTS.sheetFade}
-            transition={TRANSITION.slow}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              opacity: {
+                duration: 1.2,
+                ease: [0.4, 0, 0.2, 1],
+              },
+            }}
             className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-4 sm:rounded-[var(--radius-2xl)]"
           >
         {/* Header */}
@@ -249,4 +263,4 @@ function CartRow({
       </button>
     </article>
   );
-  }
+                    }
