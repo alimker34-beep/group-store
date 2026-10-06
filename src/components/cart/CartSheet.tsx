@@ -64,13 +64,10 @@ export function CartSheet({
   );
 
   return (
-    <AnimatePresence initial={false}>
+    <AnimatePresence>
       {open ? (
-        <motion.div
+        <div
           key="cart-sheet-root"
-          initial="initial"
-          animate="animate"
-          exit="exit"
           className="fixed inset-0 z-[var(--z-modal)]"
         >
           <motion.button
@@ -86,8 +83,7 @@ export function CartSheet({
             dir="rtl"
             variants={VARIANTS.sheetFade}
             transition={TRANSITION.slow}
-            style={{ transformOrigin: "center bottom" }}
-            className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-4 sm:rounded-[var(--radius-2xl)] will-change-[opacity,transform]"
+            className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-4 sm:rounded-[var(--radius-2xl)]"
           >
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3 sm:px-5">
@@ -151,7 +147,7 @@ export function CartSheet({
           </div>
         ) : null}
       </motion.section>
-        </motion.div>
+        </div>
       ) : null}
     </AnimatePresence>
   );
@@ -253,4 +249,4 @@ function CartRow({
       </button>
     </article>
   );
-            }
+  }
