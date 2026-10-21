@@ -175,7 +175,7 @@ export const ProductCard = memo(function ProductCard({
           }
         }}
         className={[
-          "relative cursor-pointer overflow-hidden rounded-[var(--radius-lg)]",
+          "relative isolate aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-[var(--radius-lg)]",
           "bg-surface-muted",
           "group-hover:shadow-[var(--shadow-md)]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
