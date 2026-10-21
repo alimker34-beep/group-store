@@ -10,9 +10,7 @@ export interface ProductOption {
   label: string;
   type: ProductOptionType;
   values: string[];
-  /** للـ color فقط: map من value إلى hex اختياري */
   colorMap?: Record<string, string>;
-  /** نص مساعد يظهر أسفل الخيار */
   hint?: string;
 }
 
@@ -37,10 +35,6 @@ interface ProductCardProps {
   onQuickAdd?: (product: Product) => void;
   priority?: boolean;
 }
-
-/* =========================================================
-   ICONS
-   ========================================================= */
 
 function HeartIcon({ filled = false }: { filled?: boolean }) {
   return (
@@ -93,17 +87,9 @@ function CheckIcon() {
   );
 }
 
-/* =========================================================
-   PRICE FORMATTER (placeholder — سيُستبدل بـ shared/formatPrice)
-   ========================================================= */
-
 function formatPrice(value: number) {
   return `$${value.toFixed(2)}`;
 }
-
-/* =========================================================
-   PRODUCT CARD
-   ========================================================= */
 
 export const ProductCard = memo(function ProductCard({
   product,
@@ -132,23 +118,18 @@ export const ProductCard = memo(function ProductCard({
 
   const handleQuickAdd = (event: React.MouseEvent) => {
     event.stopPropagation();
-
     if (added) return;
-
     setAdded(true);
     onQuickAdd?.(product);
-
     addedTimer.current = window.setTimeout(() => setAdded(false), 1200);
   };
 
   const handleFavorite = (event: React.MouseEvent) => {
     event.stopPropagation();
-
     const next = !localFavorite;
     setLocalFavorite(next);
     setFavPulse(true);
     onFavorite?.(product);
-
     if (favTimer.current) window.clearTimeout(favTimer.current);
     favTimer.current = window.setTimeout(() => setFavPulse(false), 700);
   };
@@ -159,10 +140,7 @@ export const ProductCard = memo(function ProductCard({
 
   return (
     <article className="group min-w-0" tabIndex={0}>
-      {/* =====================================================
-          MEDIA FRAME
-          صورة تملأ الكرت بالكامل، بدون padding أو حواف داخلية
-          ===================================================== */}
+      {/* الحاوية الرئيسية للصورة - تأخذ النسبة المطلوبة 4/5 */}
       <div
         role="button"
         tabIndex={0}
@@ -181,35 +159,28 @@ export const ProductCard = memo(function ProductCard({
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
         ].join(" ")}
       >
-        {/* ---------------------------------------------------
-            IMAGE — تملأ الإطار بالكامل
-            --------------------------------------------------- */}
-        <div className="relative aspect-[0.85] w-full overflow-hidden">
-          <ResponsiveImage
-            src={product.image}
-            alt={product.name}
-            priority={priority}
-            decoding="async"
-            loading={priority ? "eager" : "lazy"}
-            className={[
-              "absolute inset-0 h-full w-full object-cover object-center",
-              "transition-transform duration-[var(--motion-normal)]",
-              "ease-[var(--ease-emphasized)]",
-              "group-hover:scale-[1.035]",
-            ].join(" ")}
-          />
+        {/* الصورة تملأ الحاوية مباشرة */}
+        <ResponsiveImage
+          src={product.image}
+          alt={product.name}
+          priority={priority}
+          decoding="async"
+          loading={priority ? "eager" : "lazy"}
+          className={[
+            "absolute inset-0 h-full w-full object-cover object-center",
+            "transition-transform duration-[var(--motion-normal)]",
+            "ease-[var(--ease-emphasized)]",
+            "group-hover:scale-[1.035]",
+          ].join(" ")}
+        />
 
-          {/* Subtle gradient overlay for icons legibility */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/15 to-transparent opacity-70"
-          />
-        </div>
+        {/* طبقة الظل العلوية للأيقونات */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/15 to-transparent opacity-70"
+        />
 
-        {/* ---------------------------------------------------
-            FAVORITE (top-left)
-            قلب يبقى ممتلئًا، ويرجع للفراغ عند النقر مرة أخرى
-            --------------------------------------------------- */}
+        {/* زر المفضلة */}
         <div className="absolute left-2 top-2 z-20">
           <motion.button
             type="button"
@@ -230,18 +201,12 @@ export const ProductCard = memo(function ProductCard({
               "hover:bg-[color:var(--theme-surface)] active:scale-[0.94]",
             ].join(" ")}
           >
-            <span className="">
-              <HeartIcon filled={localFavorite || favPulse} />
-            </span>
+            <HeartIcon filled={localFavorite || favPulse} />
           </motion.button>
         </div>
 
-        {/* ---------------------------------------------------
-            QUICK ADD — CARVED SPIRAL NOTCH
-            الانحناء الحلزوني الناعم + لون يتدرج من خلفية الكرت
-            --------------------------------------------------- */}
+        {/* زر الإضافة السريعة */}
         <div className="pointer-events-none absolute bottom-0 right-0 z-20">
-          {/* الحلقة الخارجية: قوس ناعم + تدرج لوني خفيف */}
           <div
             className={[
               "relative",
@@ -250,7 +215,6 @@ export const ProductCard = memo(function ProductCard({
               "bg-[linear-gradient(135deg,transparent_35%,color-mix(in_srgb,var(--theme-background)_85%,transparent)_65%,var(--theme-background)_100%)]",
             ].join(" ")}
           >
-            {/* الطبقة الداخلية: تتلاشى تدريجيًا نحو لون الصفحة */}
             <div
               aria-hidden
               className={[
@@ -259,7 +223,6 @@ export const ProductCard = memo(function ProductCard({
               ].join(" ")}
             />
 
-            {/* زر الإضافة داخل الحلزون */}
             <button
               type="button"
               aria-label={`إضافة ${product.name} للسلة`}
@@ -276,7 +239,6 @@ export const ProductCard = memo(function ProductCard({
                   : "bg-[color:var(--theme-primary)] text-[color:var(--theme-text-inverse)] border border-transparent",
               ].join(" ")}
             >
-              {/* Check */}
               <span
                 className={[
                   "absolute transition-[transform,opacity] duration-[var(--motion-normal)]",
@@ -288,7 +250,6 @@ export const ProductCard = memo(function ProductCard({
                 <CheckIcon />
               </span>
 
-              {/* Plus */}
               <span
                 className={[
                   "absolute transition-[transform,opacity] duration-[var(--motion-normal)]",
@@ -304,9 +265,7 @@ export const ProductCard = memo(function ProductCard({
         </div>
       </div>
 
-      {/* =====================================================
-          META (below image)
-          ===================================================== */}
+      {/* معلومات المنتج أسفل الصورة */}
       <button
         type="button"
         onClick={() => onSelect?.(product)}
