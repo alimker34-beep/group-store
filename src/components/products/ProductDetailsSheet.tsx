@@ -60,10 +60,16 @@ export function ProductDetailsSheet({
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [added, setAdded] = useState(false);
 
+  /**
+   * كل ما يفتح المنتج، نهيّئ selections بقيم افتراضية:
+   * - select / color / text  → أول قيمة
+   * - quantity               → "1"
+   */
   useEffect(() => {
     if (!product) return;
 
     const defaults: Record<string, string> = {};
+
     (product.options ?? []).forEach((option) => {
       if (option.type === "quantity") {
         defaults[option.id] = "1";
@@ -126,14 +132,17 @@ export function ProductDetailsSheet({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          transition={{
+            duration: 0.55,
+            ease: [0.16, 1, 0.3, 1],
+          }}
         >
           <motion.div
             aria-hidden
             onClick={onClose}
             variants={VARIANTS.fadeIn}
             transition={TRANSITION.normal}
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/40 prefer-no-backdrop"
           />
 
           <motion.section
@@ -143,7 +152,8 @@ export function ProductDetailsSheet({
             animate="animate"
             exit="exit"
             transition={TRANSITION.page}
-            className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[94vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-4"
+            style={{ willChange: "transform, opacity" }}
+            className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[94vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-16"
           >
             <div className="flex shrink-0 items-center justify-between px-4 py-3 sm:px-5">
               <IconButton
@@ -168,7 +178,7 @@ export function ProductDetailsSheet({
               </IconButton>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 pb-28 sm:px-5">
+            <div className="overflow-y-auto px-4 pb-28 sm:px-5">
               <div className="flex snap-x gap-2 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {gallery.map((image, index) => (
                   <div
@@ -185,6 +195,9 @@ export function ProductDetailsSheet({
               </div>
 
               <div className="pt-4">
+                {/* ============================================
+                    العنوان + السعر (صف واحد)
+                    ============================================ */}
                 <div className="flex items-start justify-between gap-4">
                   <h2 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
                     {product.name}
@@ -195,6 +208,9 @@ export function ProductDetailsSheet({
                   </span>
                 </div>
 
+                {/* ============================================
+                    التقييم
+                    ============================================ */}
                 {product.rating ? (
                   <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted">
                     <StarIcon />
@@ -202,6 +218,9 @@ export function ProductDetailsSheet({
                   </div>
                 ) : null}
 
+                {/* ============================================
+                    الوصف — بكسافة مدروسة تحت العنوان مباشرة
+                    ============================================ */}
                 {product.description ? (
                   <p className="mt-3 text-sm leading-relaxed text-text-secondary">
                     {product.description}
@@ -240,7 +259,10 @@ export function ProductDetailsSheet({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{
+                      duration: 0.28,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
                     className="inline-flex items-center gap-2"
                   >
                     {added ? "✓ تمت الإضافة" : "إضافة إلى السلة"}
@@ -254,6 +276,10 @@ export function ProductDetailsSheet({
     </AnimatePresence>
   );
 }
+
+/* =========================================================
+   OPTION FIELD — يرسم خيارًا واحدًا حسب نوعه
+   ========================================================= */
 
 interface OptionFieldProps {
   option: ProductOption;
@@ -326,7 +352,10 @@ function OptionField({ option, value, onChange }: OptionFieldProps) {
       ) : null}
 
       {option.type === "quantity" ? (
-        <QuantityControl value={value || "1"} onChange={onChange} />
+        <QuantityControl
+          value={value || "1"}
+          onChange={onChange}
+        />
       ) : null}
 
       {option.type === "text" ? (
@@ -341,6 +370,10 @@ function OptionField({ option, value, onChange }: OptionFieldProps) {
     </div>
   );
 }
+
+/* =========================================================
+   QUANTITY CONTROL
+   ========================================================= */
 
 interface QuantityControlProps {
   value: string;
@@ -378,4 +411,4 @@ function QuantityControl({ value, onChange }: QuantityControlProps) {
       </button>
     </div>
   );
-      }
+    }
