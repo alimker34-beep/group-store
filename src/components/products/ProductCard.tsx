@@ -1,7 +1,4 @@
-import { memo, useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { TRANSITION } from "../../shared/motion";
-import ResponsiveImage from "../ui/ResponsiveImage";
+import { useState, useRef, useEffect } from "react";
 
 export type ProductOptionType = "select" | "color" | "quantity" | "text";
 
@@ -10,7 +7,9 @@ export interface ProductOption {
   label: string;
   type: ProductOptionType;
   values: string[];
+  /** للـ color فقط: map من value إلى hex اختياري */
   colorMap?: Record<string, string>;
+  /** نص مساعد يظهر أسفل الخيار */
   hint?: string;
 }
 
@@ -30,11 +29,16 @@ export interface Product {
 interface ProductCardProps {
   product: Product;
   favorite?: boolean;
+  inCart?: boolean;
   onFavorite?: (product: Product) => void;
   onSelect?: (product: Product) => void;
   onQuickAdd?: (product: Product) => void;
-  priority?: boolean;
+  onRemoveFromCart?: (product: Product) => void;
 }
+
+/* =========================================================
+   ICONS
+   ========================================================= */
 
 function HeartIcon({ filled = false }: { filled?: boolean }) {
   return (
@@ -87,21 +91,32 @@ function CheckIcon() {
   );
 }
 
+/* =========================================================
+   PRICE FORMATTER (placeholder — سيُستبدل بـ shared/formatPrice)
+   ========================================================= */
+
 function formatPrice(value: number) {
   return `$${value.toFixed(2)}`;
 }
 
-export const ProductCard = memo(function ProductCard({
+/* =========================================================
+   PRODUCT CARD
+   ========================================================= */
+
+export function ProductCard({
   product,
   favorite = false,
+  inCart = false,
   onFavorite,
   onSelect,
   onQuickAdd,
-  priority = false,
+  onRemoveFromCart,
 }: ProductCardProps) {
+  const [burst, setBurst] = useState(false);
   const [added, setAdded] = useState(false);
   const [favPulse, setFavPulse] = useState(false);
   const [localFavorite, setLocalFavorite] = useState(favorite);
+  const burstTimer = useRef<number | null>(null);
   const addedTimer = useRef<number | null>(null);
   const favTimer = useRef<number | null>(null);
 
@@ -111,6 +126,7 @@ export const ProductCard = memo(function ProductCard({
 
   useEffect(() => {
     return () => {
+      if (burstTimer.current) window.clearTimeout(burstTimer.current);
       if (addedTimer.current) window.clearTimeout(addedTimer.current);
       if (favTimer.current) window.clearTimeout(favTimer.current);
     };
@@ -118,18 +134,25 @@ export const ProductCard = memo(function ProductCard({
 
   const handleQuickAdd = (event: React.MouseEvent) => {
     event.stopPropagation();
+
     if (added) return;
+
     setAdded(true);
+    setBurst(true);
     onQuickAdd?.(product);
+
+    burstTimer.current = window.setTimeout(() => setBurst(false), 650);
     addedTimer.current = window.setTimeout(() => setAdded(false), 1200);
   };
 
   const handleFavorite = (event: React.MouseEvent) => {
     event.stopPropagation();
+
     const next = !localFavorite;
     setLocalFavorite(next);
     setFavPulse(true);
     onFavorite?.(product);
+
     if (favTimer.current) window.clearTimeout(favTimer.current);
     favTimer.current = window.setTimeout(() => setFavPulse(false), 700);
   };
@@ -139,8 +162,11 @@ export const ProductCard = memo(function ProductCard({
     product.originalPrice > product.price;
 
   return (
-    <article className="group min-w-0" tabIndex={0}>
-      {/* الحاوية الرئيسية للصورة - تأخذ النسبة المطلوبة 4/5 */}
+    <article className="group min-w-0 [perspective:1000px]">
+      {/* =====================================================
+          MEDIA FRAME
+          صورة تملأ الكرت بالكامل، بدون padding أو حواف داخلية
+          ===================================================== */}
       <div
         role="button"
         tabIndex={0}
@@ -153,68 +179,98 @@ export const ProductCard = memo(function ProductCard({
           }
         }}
         className={[
-          "relative isolate aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-[var(--radius-lg)]",
+          "relative cursor-pointer overflow-hidden rounded-[var(--radius-lg)]",
           "bg-surface-muted",
+          "transition-[transform,box-shadow] duration-[var(--motion-slow)]",
+          "ease-[var(--ease-emphasized)]",
+          "group-hover:-translate-y-0.5",
           "group-hover:shadow-[var(--shadow-md)]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
         ].join(" ")}
       >
-        {/* الصورة تملأ الحاوية مباشرة */}
-        <ResponsiveImage
-          src={product.image}
-          alt={product.name}
-          priority={priority}
-          decoding="async"
-          loading={priority ? "eager" : "lazy"}
-          className={[
-            "absolute inset-0 h-full w-full object-cover object-center",
-            "transition-transform duration-[var(--motion-normal)]",
-            "ease-[var(--ease-emphasized)]",
-            "group-hover:scale-[1.035]",
-          ].join(" ")}
-        />
+        {/* ---------------------------------------------------
+            IMAGE — تملأ الإطار بالكامل
+            --------------------------------------------------- */}
+        <div className="relative aspect-[0.85] w-full overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            draggable={false}
+            className={[
+              "absolute inset-0 h-full w-full object-cover object-center",
+              "transition-transform duration-[var(--motion-slow)]",
+              "ease-[var(--ease-emphasized)]",
+              "group-hover:scale-[1.06]",
+            ].join(" ")}
+          />
 
-        {/* طبقة الظل العلوية للأيقونات */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/15 to-transparent opacity-70"
-        />
+          {/* Subtle gradient overlay for icons legibility */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/15 to-transparent opacity-70"
+          />
+        </div>
 
-        {/* زر المفضلة */}
+        {/* ---------------------------------------------------
+            FAVORITE (top-left)
+            قلب يبقى ممتلئًا، ويرجع للفراغ عند النقر مرة أخرى
+            --------------------------------------------------- */}
         <div className="absolute left-2 top-2 z-20">
-          <motion.button
+          <button
             type="button"
             aria-label={
               localFavorite ? "إزالة من المفضلة" : "إضافة للمفضلة"
             }
             aria-pressed={localFavorite}
             onClick={handleFavorite}
-            animate={favPulse ? { scale: [1, 1.08, 1] } : { scale: 1 }}
-            transition={TRANSITION.fast}
             className={[
               "relative flex size-8 items-center justify-center rounded-full",
-              "border border-[color:var(--theme-border)] bg-[color:var(--theme-surface)]/90",
+              "border-0 bg-[color:var(--theme-surface)]/85 backdrop-blur-md",
               "shadow-[var(--shadow-xs)]",
               "text-[color:var(--theme-text)]",
-              "transition-colors duration-[var(--motion-normal)]",
+              "transition-[transform,background-color,color] duration-[var(--motion-normal)]",
               "ease-[var(--ease-emphasized)]",
-              "hover:bg-[color:var(--theme-surface)] active:scale-[0.94]",
+              "hover:bg-[color:var(--theme-surface)] hover:scale-105",
+              "active:scale-90",
+              favPulse ? "scale-110" : "",
             ].join(" ")}
           >
-            <HeartIcon filled={localFavorite || favPulse} />
-          </motion.button>
+            <span
+              className={[
+                "transition-transform duration-[var(--motion-normal)]",
+                favPulse ? "animate-[heartbeat_700ms_ease-out]" : "",
+              ].join(" ")}
+            >
+              <HeartIcon filled={localFavorite || favPulse} />
+            </span>
+
+            {/* Ping ring on pulse */}
+            {favPulse ? (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-[color:var(--theme-text)]/30 animate-[ping_600ms_ease-out]"
+              />
+            ) : null}
+          </button>
         </div>
 
-        {/* زر الإضافة السريعة */}
+        {/* ---------------------------------------------------
+            QUICK ADD — CARVED SPIRAL NOTCH
+            الانحناء الحلزوني الناعم + لون يتدرج من خلفية الكرت
+            --------------------------------------------------- */}
         <div className="pointer-events-none absolute bottom-0 right-0 z-20">
+          {/* الحلقة الخارجية: قوس ناعم + تدرج لوني خفيف */}
           <div
             className={[
               "relative",
               "w-[68px] h-[68px]",
               "rounded-tl-[68px]",
               "bg-[linear-gradient(135deg,transparent_35%,color-mix(in_srgb,var(--theme-background)_85%,transparent)_65%,var(--theme-background)_100%)]",
+              "backdrop-blur-[2px]",
             ].join(" ")}
           >
+            {/* الطبقة الداخلية: تتلاشى تدريجيًا نحو لون الصفحة */}
             <div
               aria-hidden
               className={[
@@ -223,6 +279,7 @@ export const ProductCard = memo(function ProductCard({
               ].join(" ")}
             />
 
+            {/* زر الإضافة داخل الحلزون */}
             <button
               type="button"
               aria-label={`إضافة ${product.name} للسلة`}
@@ -231,17 +288,27 @@ export const ProductCard = memo(function ProductCard({
               className={[
                 "pointer-events-auto absolute bottom-2 right-2",
                 "flex size-9 items-center justify-center rounded-full",
-                "shadow-[var(--shadow-sm)] active:scale-[0.94]",
-                "transition-colors duration-[var(--motion-normal)]",
+                "shadow-[var(--shadow-sm)]",
+                "transition-[transform,background-color,color,border-color] duration-[var(--motion-normal)]",
                 "ease-[var(--ease-emphasized)]",
+                "active:scale-90 hover:scale-105",
                 added
                   ? "bg-[color:var(--theme-surface)] text-[color:var(--theme-text)] border border-[color:var(--theme-border-strong)]"
                   : "bg-[color:var(--theme-primary)] text-[color:var(--theme-text-inverse)] border border-transparent",
               ].join(" ")}
             >
+              {/* Burst ring */}
+              {burst ? (
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-[color:var(--theme-text)]/25 animate-[ping_600ms_ease-out]"
+                />
+              ) : null}
+
+              {/* Check */}
               <span
                 className={[
-                  "absolute transition-[transform,opacity] duration-[var(--motion-normal)]",
+                  "absolute transition-all duration-[var(--motion-normal)]",
                   added
                     ? "scale-100 opacity-100 rotate-0"
                     : "scale-50 opacity-0 -rotate-90",
@@ -250,9 +317,10 @@ export const ProductCard = memo(function ProductCard({
                 <CheckIcon />
               </span>
 
+              {/* Plus */}
               <span
                 className={[
-                  "absolute transition-[transform,opacity] duration-[var(--motion-normal)]",
+                  "absolute transition-all duration-[var(--motion-normal)]",
                   added
                     ? "scale-50 opacity-0 rotate-90"
                     : "scale-100 opacity-100 rotate-0",
@@ -265,7 +333,9 @@ export const ProductCard = memo(function ProductCard({
         </div>
       </div>
 
-      {/* معلومات المنتج أسفل الصورة */}
+      {/* =====================================================
+          META (below image)
+          ===================================================== */}
       <button
         type="button"
         onClick={() => onSelect?.(product)}
@@ -300,4 +370,4 @@ export const ProductCard = memo(function ProductCard({
       </button>
     </article>
   );
-});
+        }
