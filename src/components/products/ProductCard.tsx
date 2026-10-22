@@ -175,7 +175,7 @@ export const ProductCard = memo(function ProductCard({
           }
         }}
         className={[
-          "relative isolate aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-[var(--radius-lg)]",
+          "relative cursor-pointer overflow-hidden rounded-[var(--radius-lg)]",
           "bg-surface-muted",
           "group-hover:shadow-[var(--shadow-md)]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
@@ -184,7 +184,7 @@ export const ProductCard = memo(function ProductCard({
         {/* ---------------------------------------------------
             IMAGE — تملأ الإطار بالكامل
             --------------------------------------------------- */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="relative aspect-[0.85] w-full overflow-hidden">
           <ResponsiveImage
             src={product.image}
             alt={product.name}
@@ -310,9 +310,9 @@ export const ProductCard = memo(function ProductCard({
       <button
         type="button"
         onClick={() => onSelect?.(product)}
-        className="mt-3 block w-full min-w-0 text-left"
+        className="mt-3 block w-full text-left"
       >
-        <h3 className="truncate text-sm font-medium leading-5 text-foreground">
+        <h3 className="truncate text-sm font-medium text-foreground">
           {product.name}
         </h3>
 
