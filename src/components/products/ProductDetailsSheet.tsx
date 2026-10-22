@@ -153,7 +153,7 @@ export function ProductDetailsSheet({
             exit="exit"
             transition={TRANSITION.page}
             style={{ willChange: "transform, opacity" }}
-            className="absolute inset-x-0 bottom-0 mx-auto flex h-[min(94dvh,900px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-16 sm:h-[min(calc(94dvh-4rem),900px)]"
+            className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[94vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-16"
           >
             <div className="flex shrink-0 items-center justify-between px-4 py-3 sm:px-5">
               <IconButton
@@ -178,17 +178,17 @@ export function ProductDetailsSheet({
               </IconButton>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-4 pb-5 sm:px-5">
-              <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="overflow-y-auto px-4 pb-28 sm:px-5">
+              <div className="flex snap-x gap-2 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {gallery.map((image, index) => (
                   <div
                     key={`${image}-${index}`}
-                    className="relative aspect-[4/5] w-full shrink-0 snap-center overflow-hidden rounded-[var(--radius-xl)] bg-surface-muted"
+                    className="aspect-[0.9] w-full shrink-0 snap-center overflow-hidden rounded-[var(--radius-xl)] bg-surface-muted"
                   >
                     <img
                       src={image}
                       alt={index === 0 ? product.name : ""}
-                      className="absolute inset-0 h-full w-full object-cover object-center"
+                      className="h-full w-full object-cover"
                     />
                   </div>
                 ))}
@@ -242,7 +242,7 @@ export function ProductDetailsSheet({
               </div>
             </div>
 
-            <div className="relative z-10 shrink-0 border-t border-border bg-surface p-4 sm:p-5">
+            <div className="absolute inset-x-0 bottom-0 border-t border-border bg-surface/95 p-4 sm:p-5">
               <Button
                 fullWidth
                 size="lg"
@@ -411,4 +411,4 @@ function QuantityControl({ value, onChange }: QuantityControlProps) {
       </button>
     </div>
   );
-    }
+                   }
