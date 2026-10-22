@@ -62,7 +62,7 @@ export function ProductGrid({
         {visibleItems.map((product, idx) => (
           <div
             key={product.id}
-            className="min-w-0 content-auto"
+            className="min-w-0"
           >
             <ProductCard
               product={product}
@@ -106,4 +106,4 @@ export function ProductGrid({
       />
     </>
   );
-}
+    }
