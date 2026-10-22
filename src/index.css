@@ -509,7 +509,6 @@ html, body, #root, main {
   border-top-left-radius: 32px;
   border-top-right-radius: 32px;
   position: relative;
-  z-index: 10;
   /* ظلال ناعمة لإبراز نحت البطاقة فوق الخلفية */
   box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.15);
 }
@@ -534,4 +533,4 @@ html, body, #root, main {
 .app-content-card::after {
   left: 0;
   background-radial: radial-gradient(circle at 100% 0, transparent 20px, var(--theme-background) 21px);
-   }
+}
