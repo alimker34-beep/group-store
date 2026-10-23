@@ -1,7 +1,6 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { TRANSITION } from "../../shared/motion";
-import ResponsiveImage from "../ui/ResponsiveImage";
+import { MOTION, TRANSITION } from "../../shared/motion";
 
 export type ProductOptionType = "select" | "color" | "quantity" | "text";
 
@@ -32,10 +31,11 @@ export interface Product {
 interface ProductCardProps {
   product: Product;
   favorite?: boolean;
+  inCart?: boolean;
   onFavorite?: (product: Product) => void;
   onSelect?: (product: Product) => void;
   onQuickAdd?: (product: Product) => void;
-  priority?: boolean;
+  onRemoveFromCart?: (product: Product) => void;
 }
 
 /* =========================================================
@@ -105,17 +105,20 @@ function formatPrice(value: number) {
    PRODUCT CARD
    ========================================================= */
 
-export const ProductCard = memo(function ProductCard({
+export function ProductCard({
   product,
   favorite = false,
+  inCart = false,
   onFavorite,
   onSelect,
   onQuickAdd,
-  priority = false,
+  onRemoveFromCart,
 }: ProductCardProps) {
+  const [burst, setBurst] = useState(false);
   const [added, setAdded] = useState(false);
   const [favPulse, setFavPulse] = useState(false);
   const [localFavorite, setLocalFavorite] = useState(favorite);
+  const burstTimer = useRef<number | null>(null);
   const addedTimer = useRef<number | null>(null);
   const favTimer = useRef<number | null>(null);
 
@@ -125,6 +128,7 @@ export const ProductCard = memo(function ProductCard({
 
   useEffect(() => {
     return () => {
+      if (burstTimer.current) window.clearTimeout(burstTimer.current);
       if (addedTimer.current) window.clearTimeout(addedTimer.current);
       if (favTimer.current) window.clearTimeout(favTimer.current);
     };
@@ -136,8 +140,10 @@ export const ProductCard = memo(function ProductCard({
     if (added) return;
 
     setAdded(true);
+    setBurst(true);
     onQuickAdd?.(product);
 
+    burstTimer.current = window.setTimeout(() => setBurst(false), 650);
     addedTimer.current = window.setTimeout(() => setAdded(false), 1200);
   };
 
@@ -158,7 +164,11 @@ export const ProductCard = memo(function ProductCard({
     product.originalPrice > product.price;
 
   return (
-    <article className="group min-w-0" tabIndex={0}>
+    <motion.article
+      className="group min-w-0"
+      whileHover={{ y: -2 }}
+      transition={TRANSITION.fast}
+    >
       {/* =====================================================
           MEDIA FRAME
           صورة تملأ الكرت بالكامل، بدون padding أو حواف داخلية
@@ -175,7 +185,7 @@ export const ProductCard = memo(function ProductCard({
           }
         }}
         className={[
-          "relative isolate aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-[var(--radius-lg)]",
+          "relative cursor-pointer overflow-hidden rounded-[var(--radius-lg)]",
           "bg-surface-muted",
           "group-hover:shadow-[var(--shadow-md)]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
@@ -184,13 +194,12 @@ export const ProductCard = memo(function ProductCard({
         {/* ---------------------------------------------------
             IMAGE — تملأ الإطار بالكامل
             --------------------------------------------------- */}
-        <div className="absolute inset-0 overflow-hidden">
-          <ResponsiveImage
+        <div className="relative aspect-[0.85] w-full overflow-hidden">
+          <img
             src={product.image}
             alt={product.name}
-            priority={priority}
-            decoding="async"
-            loading={priority ? "eager" : "lazy"}
+            loading="lazy"
+            draggable={false}
             className={[
               "absolute inset-0 h-full w-full object-cover object-center",
               "transition-transform duration-[var(--motion-normal)]",
@@ -218,21 +227,30 @@ export const ProductCard = memo(function ProductCard({
             }
             aria-pressed={localFavorite}
             onClick={handleFavorite}
-            animate={favPulse ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+            whileTap={{ scale: 0.94 }}
+            animate={favPulse ? { scale: [1, 1.12, 1] } : { scale: 1 }}
             transition={TRANSITION.fast}
             className={[
               "relative flex size-8 items-center justify-center rounded-full",
-              "border border-[color:var(--theme-border)] bg-[color:var(--theme-surface)]/90",
+              "border-0 bg-[color:var(--theme-surface)]/85 backdrop-blur-md",
               "shadow-[var(--shadow-xs)]",
               "text-[color:var(--theme-text)]",
               "transition-colors duration-[var(--motion-normal)]",
               "ease-[var(--ease-emphasized)]",
-              "hover:bg-[color:var(--theme-surface)] active:scale-[0.94]",
+              "hover:bg-[color:var(--theme-surface)]",
             ].join(" ")}
           >
             <span className="">
               <HeartIcon filled={localFavorite || favPulse} />
             </span>
+
+            {/* Ping ring on pulse */}
+            {favPulse ? (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-[color:var(--theme-text)]/30 animate-[ping_600ms_ease-out]"
+              />
+            ) : null}
           </motion.button>
         </div>
 
@@ -248,6 +266,7 @@ export const ProductCard = memo(function ProductCard({
               "w-[68px] h-[68px]",
               "rounded-tl-[68px]",
               "bg-[linear-gradient(135deg,transparent_35%,color-mix(in_srgb,var(--theme-background)_85%,transparent)_65%,var(--theme-background)_100%)]",
+              "backdrop-blur-[2px]",
             ].join(" ")}
           >
             {/* الطبقة الداخلية: تتلاشى تدريجيًا نحو لون الصفحة */}
@@ -260,15 +279,17 @@ export const ProductCard = memo(function ProductCard({
             />
 
             {/* زر الإضافة داخل الحلزون */}
-            <button
+            <motion.button
               type="button"
               aria-label={`إضافة ${product.name} للسلة`}
               aria-pressed={added}
               onClick={handleQuickAdd}
+              whileTap={{ scale: 0.94 }}
+              transition={TRANSITION.fast}
               className={[
                 "pointer-events-auto absolute bottom-2 right-2",
                 "flex size-9 items-center justify-center rounded-full",
-                "shadow-[var(--shadow-sm)] active:scale-[0.94]",
+                "shadow-[var(--shadow-sm)]",
                 "transition-colors duration-[var(--motion-normal)]",
                 "ease-[var(--ease-emphasized)]",
                 added
@@ -276,10 +297,18 @@ export const ProductCard = memo(function ProductCard({
                   : "bg-[color:var(--theme-primary)] text-[color:var(--theme-text-inverse)] border border-transparent",
               ].join(" ")}
             >
+              {/* Burst ring */}
+              {burst ? (
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-[color:var(--theme-text)]/25 animate-[ping_600ms_ease-out]"
+                />
+              ) : null}
+
               {/* Check */}
               <span
                 className={[
-                  "absolute transition-[transform,opacity] duration-[var(--motion-normal)]",
+                  "absolute transition-all duration-[var(--motion-normal)]",
                   added
                     ? "scale-100 opacity-100 rotate-0"
                     : "scale-50 opacity-0 -rotate-90",
@@ -291,7 +320,7 @@ export const ProductCard = memo(function ProductCard({
               {/* Plus */}
               <span
                 className={[
-                  "absolute transition-[transform,opacity] duration-[var(--motion-normal)]",
+                  "absolute transition-all duration-[var(--motion-normal)]",
                   added
                     ? "scale-50 opacity-0 rotate-90"
                     : "scale-100 opacity-100 rotate-0",
@@ -299,7 +328,7 @@ export const ProductCard = memo(function ProductCard({
               >
                 <PlusIcon />
               </span>
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
@@ -310,9 +339,9 @@ export const ProductCard = memo(function ProductCard({
       <button
         type="button"
         onClick={() => onSelect?.(product)}
-        className="mt-3 block w-full min-w-0 text-left"
+        className="mt-3 block w-full text-left"
       >
-        <h3 className="truncate text-sm font-medium leading-5 text-foreground">
+        <h3 className="truncate text-sm font-medium text-foreground">
           {product.name}
         </h3>
 
@@ -339,6 +368,6 @@ export const ProductCard = memo(function ProductCard({
           ) : null}
         </div>
       </button>
-    </article>
+    </motion.article>
   );
-});
+}
