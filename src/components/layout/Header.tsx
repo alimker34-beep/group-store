@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { IconButton } from "../ui/IconButton";
 import ResponsiveImage from "../ui/ResponsiveImage";
 
@@ -83,8 +84,11 @@ export function Header({
   onProfileClick,
   onNotificationsClick,
 }: HeaderProps) {
+  // أضف هذه الحالة هنا لمعرفة هل المستخدم ضغط مطولاً أم لا
+  const [isPressed, setIsPressed] = useState(false);
+
   return (
-    <header className="w-full bg-transparent px-4 pt-3 pb-6">
+    <header className="w-full bg-transparent px-4 pt-3 pb-6 relative">
       <div className="mx-auto flex h-14 max-w-[var(--content-max-width)] items-center justify-between">
         {/* =====================================================
             [1] الأزرار — يمين
@@ -120,25 +124,41 @@ export function Header({
         </div>
 
         {/* =====================================================
-            [2] STORY
+            [2] STORY (مع تأثير الضغط المطول والضبابية)
             ===================================================== */}
-        <div className="flex translate-y-1 items-center">
+        
+        {/* طبقة التعتيم والضبابية الخلفية التي تظهر عند الضغط مطولاً */}
+        {isPressed && (
+          <div 
+            aria-hidden="true"
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-md transition-opacity duration-300"
+          />
+        )}
+
+        <div className="flex translate-y-1 items-center relative z-50">
           <button
             type="button"
             onClick={onProfileClick}
+            // أحداث الضغط والتحرير (للهواتف والأجهزة المكتبية)
+            onMouseDown={() => setIsPressed(true)}
+            onMouseUp={() => setIsPressed(false)}
+            onMouseLeave={() => setIsPressed(false)}
+            onTouchStart={() => setIsPressed(true)}
+            onTouchEnd={() => setIsPressed(false)}
             aria-label="عرض قصة المتجر"
-            className="group flex items-center outline-none"
+            className="group flex items-center outline-none select-none"
           >
-            {/* Story Ring */}
+            {/* Story Ring - تم ربط الحجم والتكبير بحالة isPressed */}
             <span
               className={[
-                "relative flex size-[52px] shrink-0 items-center justify-center rounded-full",
+                "relative flex shrink-0 items-center justify-center rounded-full",
                 "bg-[conic-gradient(from_180deg,#e0f2fe,#7dd3fc,#38bdf8,#93c5fd,#e0f2fe)]",
                 "p-[2px]",
                 "shadow-[0_0_0_1px_rgba(56,189,248,0.12)]",
-                "transition-transform duration-200",
-                "group-hover:scale-[1.03]",
-                "group-active:scale-95",
+                "transition-all duration-300 ease-out",
+                isPressed 
+                  ? "size-[96px] scale-110 shadow-2xl ring-4 ring-white/40" 
+                  : "size-[52px] group-hover:scale-[1.03] group-active:scale-95",
               ].join(" ")}
             >
               {/* Subtle hover ring */}
