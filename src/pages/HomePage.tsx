@@ -60,9 +60,7 @@ export default function HomePage({
 
         <section className="mb-8">
           <PromoBanner
-            title="خصم اليوم فقط"
-            subtitle="اكتشف تشكيلتنا الجديدة واحصل على عروض مميزة."
-            buttonLabel="تصفح العرض"
+            onClick={() => onNavigate("/offers")}
           />
         </section>
 
