@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import ProductPage from "./pages/ProductPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import FavoritesPage from "./pages/FavoritesPage";
+import OffersPage from "./pages/OffersPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import { CartSheet } from "./components/cart/CartSheet";
@@ -28,6 +29,7 @@ type Route =
   | { name: "welcome" }
   | { name: "home" }
   | { name: "favorites" }
+  | { name: "offers" }
   | { name: "product"; id: string }
   | { name: "notifications" }
   | { name: "checkout" }
@@ -37,6 +39,7 @@ function resolveRoute(pathname: string): Route {
   if (pathname === "/" || pathname === "/welcome") return { name: "welcome" };
   if (pathname === "/store") return { name: "home" };
   if (pathname === "/favorites") return { name: "favorites" };
+  if (pathname === "/offers") return { name: "offers" };
   if (pathname === "/notifications") return { name: "notifications" };
   if (pathname === "/checkout") return { name: "checkout" };
   if (pathname === "/success") return { name: "success" };
@@ -385,6 +388,17 @@ function App() {
                     isInCart={isInCart}
                     isDark={isDark}
                     onToggleTheme={toggleTheme}
+                  />
+                );
+
+              case "offers":
+                return (
+                  <OffersPage
+                    onNavigate={navigate}
+                    cartCount={cartCount}
+                    isDark={isDark}
+                    onToggleTheme={toggleTheme}
+                    onAddToCart={addToCart}
                   />
                 );
 
