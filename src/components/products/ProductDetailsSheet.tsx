@@ -153,7 +153,7 @@ export function ProductDetailsSheet({
             exit="exit"
             transition={TRANSITION.page}
             style={{ willChange: "transform, opacity" }}
-            className="absolute inset-x-0 bottom-0 mx-auto flex h-[min(94dvh,900px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-xl)] sm:bottom-16 sm:h-[min(calc(94dvh-4rem),900px)]"
+            className="fixed inset-0 z-50 mx-auto flex h-[100dvh] w-full max-w-2xl flex-col overflow-hidden bg-surface shadow-[var(--shadow-xl)]"
           >
             <div className="flex shrink-0 items-center justify-between px-4 py-3 sm:px-5">
               <IconButton
@@ -411,4 +411,4 @@ function QuantityControl({ value, onChange }: QuantityControlProps) {
       </button>
     </div>
   );
-  }
+      }
