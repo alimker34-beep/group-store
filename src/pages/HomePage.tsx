@@ -1,9 +1,9 @@
-import { motion } from "framer-motion";
 import { Header } from "../components/layout/Header";
 import { BottomNav } from "../components/layout/BottomNav";
 import { PromoBanner } from "../components/products/PromoBanner";
 import { ProductGrid } from "../components/products/ProductGrid";
 import type { Product } from "../components/products/ProductCard";
+import { motion } from "framer-motion";
 import { MOTION } from "../shared/motion";
 
 interface HomePageProps {
@@ -46,52 +46,39 @@ export default function HomePage({
         onCartClick={() => onNavigate("/checkout")}
       />
 
-      {/* الحاوية المنحوتة العلوية مع سحب المظهر وتدفق العناصر بشكل طبيعي بدون contain */}
-      <div className="app-content-card relative z-10 -mt-[12px] mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-5 md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]">
-        
-        <motion.div
-          className="mb-6"
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: MOTION.smooth, ease: MOTION.ease }}
-        >
+      {/* تم حذف style={{ contain: "layout style" }} حتى لا تقص حواف الانحناء */}
+      <div
+        className="app-content-card -mt-[12px] relative mx-auto w-full max-w-[var(--content-max-width)] px-[var(--page-padding-mobile)] pb-[calc(var(--bottom-nav-height)+2rem)] pt-5 md:px-[var(--page-padding-tablet)] lg:px-[var(--page-padding-desktop)]"
+      >
+        <div className="mb-6">
           <p className="text-sm font-medium text-muted">اكتشف الجديد</p>
+
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             منتجات تستحق أن تراها
           </h1>
-        </motion.div>
+        </div>
 
-        {/* تم حذف style={{ contain: ... }} لحماية حواف الانحناء وزر الإضافة */}
-        <motion.section
-          className="mb-8"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: MOTION.smooth,
-            ease: MOTION.ease,
-            delay: 0.05,
-          }}
-        >
+        <section className="mb-8">
           <PromoBanner
             title="خصم اليوم فقط"
             subtitle="اكتشف تشكيلتنا الجديدة واحصل على عروض مميزة."
             buttonLabel="تصفح العرض"
           />
-        </motion.section>
+        </section>
 
-        {/* تم حذف style={{ contain: ... }} لمنع قص زوايا المنتجات وقائمة التفاصيل */}
         <motion.section
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
             duration: MOTION.smooth,
             ease: MOTION.ease,
-            delay: 0.1,
+            delay: 0.08,
           }}
         >
           <div className="mb-4 flex items-end justify-between">
             <div>
               <p className="text-xs font-medium text-muted">مختاراتنا</p>
+
               <h2 className="mt-1 text-xl font-semibold text-foreground">
                 الأكثر طلبًا
               </h2>
@@ -99,7 +86,7 @@ export default function HomePage({
 
             <button
               type="button"
-              className="text-sm font-medium text-muted transition-colors duration-[var(--motion-normal)] hover:text-foreground"
+              className="text-sm font-medium text-muted transition-[color] duration-[var(--motion-normal)] hover:text-foreground"
             >
               عرض الكل
             </button>
@@ -129,5 +116,4 @@ export default function HomePage({
       />
     </main>
   );
-}
-
+            }
