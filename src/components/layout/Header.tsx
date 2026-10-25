@@ -141,15 +141,15 @@ function StoryViewer({
       transition={{ duration: 0.25 }}
       onClick={onClose}
     >
-      {/* خلفية ضبابية داكنة وعميقة */}
+      {/* خلفية زجاجية ضبابية وناعمة (Frosted Glass) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <img
           src={avatarUrl}
           alt=""
           aria-hidden="true"
-          className="h-full w-full scale-125 object-cover blur-[60px] opacity-60"
+          className="h-full w-full scale-150 object-cover blur-[70px] opacity-50"
         />
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+        <div className="absolute inset-0 bg-background/30 backdrop-blur-2xl" />
       </div>
 
       {/* زر الإغلاق */}
@@ -367,4 +367,4 @@ export function Header({
       </div>
     </header>
   );
-      }
+}
