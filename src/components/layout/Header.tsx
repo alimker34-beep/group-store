@@ -98,6 +98,21 @@ function StoryViewer({
   const hasStories = stories.length > 0;
   const story = stories[index];
 
+  // عزل السكرول تماماً أثناء فتح القصة
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -126,15 +141,15 @@ function StoryViewer({
       transition={{ duration: 0.25 }}
       onClick={onClose}
     >
-      {/* خلفية ضبابية مأخوذة من صورة المتجر */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* خلفية ضبابية داكنة وعميقة */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <img
           src={avatarUrl}
           alt=""
           aria-hidden="true"
-          className="h-full w-full scale-110 object-cover blur-3xl opacity-40"
+          className="h-full w-full scale-125 object-cover blur-[60px] opacity-60"
         />
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
       </div>
 
       {/* زر الإغلاق */}
@@ -352,4 +367,4 @@ export function Header({
       </div>
     </header>
   );
-    }
+      }
