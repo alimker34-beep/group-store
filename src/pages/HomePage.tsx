@@ -2,9 +2,12 @@ import { Header } from "../components/layout/Header";
 import { BottomNav } from "../components/layout/BottomNav";
 import { PromoBanner } from "../components/products/PromoBanner";
 import { ProductGrid } from "../components/products/ProductGrid";
+import { CategoryFilter } from "../components/products/CategoryFilter";
+import { categories } from "../components/products/mockProducts";
 import type { Product } from "../components/products/ProductCard";
 import { motion } from "framer-motion";
 import { MOTION } from "../shared/motion";
+import { useState } from "react";
 
 interface HomePageProps {
   onNavigate: (path: string) => void;
@@ -32,6 +35,7 @@ export default function HomePage({
   isDark,
   onToggleTheme,
 }: HomePageProps) {
+  const [activeCategory, setActiveCategory] = useState("all");
   const showFloating = cartCount > 0;
 
   return (
@@ -58,9 +62,17 @@ export default function HomePage({
           </h1>
         </div>
 
-        <section className="mb-8">
+        <section className="mb-6">
           <PromoBanner
             onClick={() => onNavigate("/offers")}
+          />
+        </section>
+
+        <section className="mb-6">
+          <CategoryFilter
+            categories={categories}
+            activeCategory={activeCategory}
+            onChange={setActiveCategory}
           />
         </section>
 
@@ -91,6 +103,7 @@ export default function HomePage({
           </div>
 
           <ProductGrid
+            categoryFilter={activeCategory}
             isInCart={isInCart}
             isFavorite={(id) => favorites.includes(id)}
             onQuickAdd={onAddToCart}
@@ -114,4 +127,4 @@ export default function HomePage({
       />
     </main>
   );
-            }
+}
