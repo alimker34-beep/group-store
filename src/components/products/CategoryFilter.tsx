@@ -17,11 +17,7 @@ export function CategoryFilter({
   onChange,
 }: CategoryFilterProps) {
   return (
-    <div className="relative w-full overflow-hidden">
-      {/* التدرج الجانبي لإعطاء إيحاء بوجود المزيد من الأزرار */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-[#f0f2f5] to-transparent dark:from-background" />
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-[#f0f2f5] to-transparent dark:from-background" />
-
+    <div className="relative w-full">
       {/* حاوية التمرير الأفقي */}
       <div
         dir="rtl"
@@ -42,7 +38,7 @@ export function CategoryFilter({
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                 isActive
                   ? "text-inverse"
-                  : "bg-surface text-muted hover:bg-secondary hover:text-foreground border border-border/50",
+                  : "bg-surface text-foreground/90 hover:bg-secondary hover:text-foreground border border-border/90 shadow-xs",
               ].join(" ")}
             >
               {/* الخلفية المتحركة للزر النشط */}
@@ -52,8 +48,9 @@ export function CategoryFilter({
                   className="absolute inset-0 rounded-full bg-primary shadow-md"
                   transition={{
                     type: "spring",
-                    stiffness: 400,
-                    damping: 30,
+                    stiffness: 280,
+                    damping: 18,
+                    mass: 0.9,
                   }}
                 />
               )}
@@ -66,4 +63,4 @@ export function CategoryFilter({
       </div>
     </div>
   );
-      }
+                }
