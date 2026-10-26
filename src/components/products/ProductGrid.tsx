@@ -8,6 +8,7 @@ const PAGE_SIZE = 15;
 interface ProductGridProps {
   products?: Product[];
   loading?: boolean;
+  categoryFilter?: string;
   isInCart?: (productId: string) => boolean;
   isFavorite?: (productId: string) => boolean;
   onQuickAdd?: (
@@ -31,6 +32,7 @@ function ProductSkeleton() {
 export function ProductGrid({
   products,
   loading = false,
+  categoryFilter = "all",
   isInCart,
   isFavorite,
   onQuickAdd,
@@ -40,7 +42,13 @@ export function ProductGrid({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const items = products ?? getMockProducts();
+  const allItems = products ?? getMockProducts();
+
+  const items =
+    categoryFilter === "all"
+      ? allItems
+      : allItems.filter((p) => p.category === categoryFilter);
+
   const visibleItems = items.slice(0, visibleCount);
 
   if (loading) {
@@ -106,4 +114,4 @@ export function ProductGrid({
       />
     </>
   );
-    }
+}
