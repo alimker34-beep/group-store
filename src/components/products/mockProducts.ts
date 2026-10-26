@@ -153,3 +153,22 @@ export const mockProducts: Product[] = [
 export function getMockProducts(): Product[] {
   return mockProducts;
 }
+
+/* =========================================================
+   CATEGORIES — أقسام المتجر
+   ========================================================= */
+
+export interface Category {
+  id: string;
+  label: string;
+}
+
+export const categories: Category[] = [
+  { id: "all", label: "الكل" },
+  { id: "clothing", label: "ملابس" },
+  { id: "perfume", label: "عطور" },
+  { id: "bags", label: "حقائب" },
+  { id: "electronics", label: "إلكترونيات" },
+  { id: "food", label: "أغذية" },
+  { id: "stationery", label: "مكتبيات" },
+];
