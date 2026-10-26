@@ -21,7 +21,17 @@ export function CategoryFilter({
       {/* حاوية التمرير الأفقي */}
       <div
         dir="rtl"
-        className="flex w-full gap-2 overflow-x-auto px-4 pb-2 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className={[
+          "flex w-full gap-2 overflow-x-auto px-4 pb-2 pt-1",
+          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "[-ms-overflow-style:none]",
+          "overscroll-x-none",
+        ].join(" ")}
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          WebkitOverflowScrolling: "touch",
+        }}
       >
         {categories.map((category) => {
           const isActive = activeCategory === category.id;
