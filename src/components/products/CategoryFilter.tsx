@@ -44,7 +44,7 @@ export function CategoryFilter({
               className={[
                 "relative flex shrink-0 items-center justify-center",
                 "h-10 rounded-full px-5",
-                "text-sm font-medium transition-colors duration-200",
+                "text-sm font-medium transition-colors duration-150",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                 isActive
                   ? "text-inverse"
@@ -58,9 +58,12 @@ export function CategoryFilter({
                   className="absolute inset-0 rounded-full bg-primary shadow-md"
                   transition={{
                     type: "spring",
-                    stiffness: 280,
-                    damping: 18,
-                    mass: 0.9,
+                    stiffness: 420,
+                    damping: 34,
+                    mass: 0.65,
+                  }}
+                  style={{
+                    willChange: "transform",
                   }}
                 />
               )}
