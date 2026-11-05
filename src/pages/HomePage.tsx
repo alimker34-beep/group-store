@@ -3,11 +3,11 @@ import { BottomNav } from "../components/layout/BottomNav";
 import { PromoBanner } from "../components/products/PromoBanner";
 import { ProductGrid } from "../components/products/ProductGrid";
 import { CategoryFilter } from "../components/products/CategoryFilter";
-import { categories } from "../components/products/mockProducts";
 import type { Product } from "../components/products/ProductCard";
 import { motion } from "framer-motion";
 import { MOTION } from "../shared/motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getStoreProducts, getStoreCategories, type Category } from "../services/products";
 
 interface HomePageProps {
   onNavigate: (path: string) => void;
@@ -35,7 +35,20 @@ export default function HomePage({
   isDark,
   onToggleTheme,
 }: HomePageProps) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
+
+  // جلب الأقسام المفعلة عند تحميل الصفحة
+  useEffect(() => {
+    getStoreCategories().then((res) => setCategories(res));
+  }, []);
+
+  // جلب المنتجات وتحديثها عند تغيير القسم النشط
+  useEffect(() => {
+    getStoreProducts(activeCategory).then((res) => setProducts(res));
+  }, [activeCategory]);
+
   const showFloating = cartCount > 0;
 
   return (
