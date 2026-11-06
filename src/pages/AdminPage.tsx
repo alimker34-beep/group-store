@@ -51,9 +51,15 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
   // جلب المنتجات عند تسجيل الدخول
   const loadProducts = async () => {
     setLoading(true);
-    const data = await getStoreProducts("all");
-    setProducts(data);
-    setLoading(false);
+
+    try {
+      const data = await getStoreProducts("all");
+      setProducts(data);
+    } catch (error) {
+      console.error("فشل تحميل المنتجات:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -75,25 +81,47 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
   // إضافة منتج جديد
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !price || !image) {
+
+    if (isSubmitting) return;
+
+    if (!name.trim() || !price || !image.trim()) {
       alert("الرجاء ملء الحقول الأساسية (الاسم، السعر، الصورة)");
       return;
     }
 
-    try {
-      setIsSubmitting(true);
+    const numericPrice = Number(price);
+    const numericOriginalPrice = originalPrice
+      ? Number(originalPrice)
+      : undefined;
 
-      await addProduct({
-        name,
-        price: Number(price),
-        originalPrice: originalPrice ? Number(originalPrice) : undefined,
+    if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+      alert("يرجى إدخال سعر صحيح");
+      return;
+    }
+
+    if (
+      numericOriginalPrice !== undefined &&
+      (!Number.isFinite(numericOriginalPrice) ||
+        numericOriginalPrice <= numericPrice)
+    ) {
+      alert("السعر الأصلي يجب أن يكون أكبر من السعر الحالي");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const productId = await addProduct({
+        name: name.trim(),
+        price: numericPrice,
+        originalPrice: numericOriginalPrice,
         category,
-        image,
-        description,
+        image: image.trim(),
+        description: description.trim(),
         options: [],
       });
 
-      alert("تمت إضافة المنتج بنجاح!");
+      console.log("تم حفظ المنتج في Firestore، المعرف:", productId);
 
       setName("");
       setPrice("");
@@ -102,8 +130,11 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
       setDescription("");
 
       await loadProducts();
-    } catch (err) {
-      alert("حدث خطأ أثناء الإضافة");
+
+      alert("تمت إضافة المنتج بنجاح!");
+    } catch (error) {
+      console.error("فشل نشر المنتج:", error);
+      alert("فشل نشر المنتج. افتح Console لمعرفة السبب.");
     } finally {
       setIsSubmitting(false);
     }
