@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { db } from "./firebase";
 import type { Product } from "../components/products/ProductCard";
 
@@ -8,9 +8,7 @@ export interface Category {
   isVisible?: boolean;
 }
 
-/* ---------------------------------------------------------
-   [1] جلب المنتجات (الكل أو المفلترة حسب القسم)
-   --------------------------------------------------------- */
+// جلب المنتجات
 export async function getStoreProducts(categoryId: string = "all"): Promise<Product[]> {
   try {
     const productsRef = collection(db, "products");
@@ -23,29 +21,26 @@ export async function getStoreProducts(categoryId: string = "all"): Promise<Prod
     const snapshot = await getDocs(q);
     const products: Product[] = [];
 
-    snapshot.forEach((doc) => {
-      products.push({ id: doc.id, ...doc.data() } as Product);
+    snapshot.forEach((docItem) => {
+      products.push({ id: docItem.id, ...docItem.data() } as Product);
     });
 
     return products;
   } catch (error) {
-    console.error("خطأ في جلب المنتجات من فايربيز:", error);
+    console.error("خطأ في جلب المنتجات:", error);
     return [];
   }
 }
 
-/* ---------------------------------------------------------
-   [2] جلب المنتجات المخفضة فقط (قسم التخفيضات / العروض)
-   --------------------------------------------------------- */
+// جلب التخفيضات
 export async function getDiscountedProducts(): Promise<Product[]> {
   try {
     const productsRef = collection(db, "products");
     const snapshot = await getDocs(productsRef);
     const discounted: Product[] = [];
 
-    snapshot.forEach((doc) => {
-      const product = { id: doc.id, ...doc.data() } as Product;
-      // جلب المنتجات التي تحتوي على سعر أصلي أعلى من السعر الحالي
+    snapshot.forEach((docItem) => {
+      const product = { id: docItem.id, ...docItem.data() } as Product;
       if (product.originalPrice && product.originalPrice > product.price) {
         discounted.push(product);
       }
@@ -53,40 +48,53 @@ export async function getDiscountedProducts(): Promise<Product[]> {
 
     return discounted;
   } catch (error) {
-    console.error("خطأ في جلب التخفيضات من فايربيز:", error);
+    console.error("خطأ في جلب التخفيضات:", error);
     return [];
   }
 }
 
-/* ---------------------------------------------------------
-   [3] جلب الأقسام الفعالة فقط للتحكم بالإظهار والإخفاء
-   --------------------------------------------------------- */
+// جلب الأقسام
 export async function getStoreCategories(): Promise<Category[]> {
   try {
     const categoriesRef = collection(db, "categories");
     const snapshot = await getDocs(categoriesRef);
     const categories: Category[] = [{ id: "all", label: "الكل" }];
 
-    snapshot.forEach((doc) => {
-      const data = doc.data() as Category;
-      // إذا كان القسم مرئياً (isVisible !== false)، يتم إضافته للقائمة
+    snapshot.forEach((docItem) => {
+      const data = docItem.data() as Category;
       if (data.isVisible !== false) {
-        categories.push({ id: doc.id, label: data.label });
+        categories.push({ id: docItem.id, label: data.label });
       }
     });
 
     return categories;
   } catch (error) {
     console.error("خطأ في جلب الأقسام:", error);
-    // إرجاع الأقسام الافتراضية في حال الخطأ
-    return [
-      { id: "all", label: "الكل" },
-      { id: "clothing", label: "ملابس" },
-      { id: "perfume", label: "عطور" },
-      { id: "bags", label: "حقائب" },
-      { id: "electronics", label: "إلكترونيات" },
-      { id: "food", label: "أغذية" },
-      { id: "stationery", label: "مكتبيات" },
-    ];
+    return [{ id: "all", label: "الكل" }];
+  }
+}
+
+/* =========================================================
+   إدارة لوحة التحكم (إضافة وحذف المنتجات)
+   ========================================================= */
+
+// إضافة منتج جديد لقاعدة البيانات
+export async function addProduct(productData: Omit<Product, "id">) {
+  try {
+    const docRef = await addDoc(collection(db, "products"), productData);
+    return docRef.id;
+  } catch (error) {
+    console.error("خطأ في إضافة المنتج:", error);
+    throw error;
+  }
+}
+
+// حذف منتج من قاعدة البيانات
+export async function deleteProduct(productId: string) {
+  try {
+    await deleteDoc(doc(db, "products", productId));
+  } catch (error) {
+    console.error("خطأ في حذف المنتج:", error);
+    throw error;
   }
 }
