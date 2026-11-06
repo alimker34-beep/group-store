@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { getStoreProducts, addProduct, deleteProduct } from "../services/products";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  getStoreProducts,
+  addProduct,
+  deleteProduct,
+} from "../services/products";
 import type { Product } from "../components/products/ProductCard";
 
 interface AdminPageProps {
@@ -17,6 +22,12 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [currentView, setCurrentView] = useState<"dashboard" | "products">("dashboard");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
+
   // حقول نموذج إضافة منتج جديد
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -24,6 +35,18 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
   const [category, setCategory] = useState("clothing");
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
+
+  const categoryOptions = [
+    { value: "clothing", label: "ملابس" },
+    { value: "perfume", label: "عطور" },
+    { value: "bags", label: "حقائب" },
+    { value: "electronics", label: "إلكترونيات" },
+    { value: "food", label: "أغذية" },
+    { value: "stationery", label: "مكتبيات" },
+  ];
+
+  const selectedCategory =
+    categoryOptions.find((item) => item.value === category)?.label ?? "اختر القسم";
 
   // جلب المنتجات عند تسجيل الدخول
   const loadProducts = async () => {
@@ -58,6 +81,8 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
     }
 
     try {
+      setIsSubmitting(true);
+
       await addProduct({
         name,
         price: Number(price),
@@ -69,16 +94,18 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
       });
 
       alert("تمت إضافة المنتج بنجاح!");
-      // تفريغ الحقول
+
       setName("");
       setPrice("");
       setOriginalPrice("");
       setImage("");
       setDescription("");
-      // تحديث القائمة
-      loadProducts();
+
+      await loadProducts();
     } catch (err) {
       alert("حدث خطأ أثناء الإضافة");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -97,8 +124,8 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
   // إذا لم يتم تسجيل الدخول، أظهر شاشة كلمة المرور السرية
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white p-4">
-        <form onSubmit={handleLogin} className="bg-gray-900 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-800">
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f5] text-[#111] p-4">
+        <form onSubmit={handleLogin} className="w-full max-w-md rounded-3xl border border-black/5 bg-white p-8 shadow-[0_20px_60px_rgba(0,0,0,0.07)]">
           <h2 className="text-2xl font-bold mb-6 text-center">🔐 لوحة التحكم السرية</h2>
           <p className="text-gray-400 text-sm mb-4 text-center">أدخل الرمز السري للوصول إلى إدارة المتجر:</p>
           <input
@@ -126,110 +153,334 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
     );
   }
 
+  if (currentView === "products") {
+    return (
+      <div dir="rtl" className="min-h-screen bg-[#f5f5f5] px-4 py-5 text-[#111] md:px-8 md:py-8">
+        <div className="mx-auto max-w-5xl">
+
+          <div className="mb-7 flex items-center justify-between rounded-[22px] border border-black/[0.06] bg-white p-4 shadow-sm">
+            <div>
+              <h1 className="text-lg font-bold">منتجات المتجر</h1>
+              <p className="mt-1 text-xs text-[#888]">
+                {products.length} منتج
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setCurrentView("dashboard")}
+              className="rounded-full bg-[#111] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#292929] active:scale-95"
+            >
+              العودة
+            </button>
+          </div>
+
+          {loading ? (
+            <div className="rounded-2xl bg-white py-12 text-center text-sm text-[#888]">
+              جارٍ تحميل المنتجات...
+            </div>
+          ) : products.length === 0 ? (
+            <div className="rounded-2xl bg-white py-12 text-center text-sm text-[#888]">
+              لا توجد منتجات حتى الآن.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {products.map((prod) => (
+                <motion.article
+                  key={prod.id}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="overflow-hidden rounded-[20px] border border-black/[0.06] bg-white shadow-[0_4px_18px_rgba(0,0,0,0.035)]"
+                >
+                  <div className="aspect-[4/5] overflow-hidden bg-[#f2f2f2]">
+                    <img
+                      src={prod.image}
+                      alt={prod.name}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+
+                  <div className="p-3">
+                    <h3 className="truncate text-sm font-bold">
+                      {prod.name}
+                    </h3>
+
+                    <p className="mt-1 text-sm font-semibold tabular-nums">
+                      ${prod.price}
+                    </p>
+
+                    <p className="mt-1 truncate text-xs text-[#888]">
+                      {categoryOptions.find((item) => item.value === prod.category)?.label ?? prod.category}
+                    </p>
+
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProductToDelete(prod.id);
+                          setShowDeleteModal(true);
+                        }}
+                        className="flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 active:scale-95"
+                      >
+                        <span>حذف</span>
+                        <span>⌫</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // سنربط التعديل بعد التأكد من خدمة updateProduct
+                        }}
+                        className="flex items-center justify-center gap-1.5 rounded-xl bg-[#111] py-2.5 text-xs font-semibold text-white transition hover:bg-[#292929] active:scale-95"
+                      >
+                        <span>تعديل</span>
+                        <span>✎</span>
+                      </button>
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          )}
+
+          {/* نافذة تأكيد الحذف */}
+          <AnimatePresence>
+            {showDeleteModal && (
+              <motion.div
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-5 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowDeleteModal(false)}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 15, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={(event) => event.stopPropagation()}
+                  className="w-full max-w-sm rounded-[24px] border border-black/[0.06] bg-white p-6 shadow-2xl"
+                >
+                  <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-red-50 text-xl text-red-600">
+                    !
+                  </div>
+
+                  <h3 className="text-center text-lg font-bold">
+                    حذف المنتج؟
+                  </h3>
+
+                  <p className="mt-2 text-center text-sm leading-6 text-[#777]">
+                    هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.
+                  </p>
+
+                  <div className="mt-6 grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowDeleteModal(false)}
+                      className="rounded-xl border border-black/10 py-3 text-sm font-semibold transition hover:bg-[#f5f5f5]"
+                    >
+                      إلغاء
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!productToDelete) return;
+
+                        try {
+                          await deleteProduct(productToDelete);
+                          setProducts((prev) =>
+                            prev.filter((item) => item.id !== productToDelete)
+                          );
+                          setShowDeleteModal(false);
+                          setProductToDelete(null);
+                        } catch {
+                          alert("فشل حذف المنتج");
+                        }
+                      }}
+                      className="rounded-xl bg-[#111] py-3 text-sm font-semibold text-white transition hover:bg-red-600 active:scale-95"
+                    >
+                      تأكيد الحذف
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+        </div>
+      </div>
+    );
+  }
+
   // واجهة لوحة التحكم بعد الدخول بنجاح
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-4 md:p-8 dir-rtl">
-      <div className="max-w-5xl mx-auto">
-        {/* الهيدر */}
-        <div className="flex justify-between items-center mb-8 bg-gray-900 p-4 rounded-2xl border border-gray-800">
-          <h1 className="text-xl font-bold">⚡ لوحة إدارة متجر </h1>
+    <div dir="rtl" className="min-h-screen bg-[#f5f5f5] px-4 py-5 text-[#111] md:px-8 md:py-8">
+      <div className="mx-auto w-full max-w-5xl">
+        {/* Header Capsule */}
+        <div className="mb-7 flex min-h-[76px] items-center justify-between gap-3 rounded-[22px] border border-black/[0.06] bg-white px-4 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.035)] sm:px-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#111] text-white">
+              <span className="text-lg">✦</span>
+            </span>
+
+            <h1 className="whitespace-nowrap text-base font-bold tracking-tight sm:text-lg">
+              لوحة التحكم
+            </h1>
+          </div>
+
           <button
+            type="button"
             onClick={() => onNavigate("/store")}
-            className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl text-sm transition"
+            className="flex shrink-0 items-center gap-2 rounded-full bg-[#111] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#292929] active:scale-[0.97]"
           >
-            عرض المتجر الحي 🛒
+            <span>المتجر</span>
+            <span aria-hidden="true">↗</span>
           </button>
         </div>
 
         {/* نموذج إضافة منتج */}
-        <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800 mb-8 shadow-lg">
-          <h2 className="text-lg font-semibold mb-4 text-blue-400">➕ إضافة منتج جديد بكل سهولة</h2>
+        <div className="mb-7 rounded-[24px] border border-black/[0.06] bg-white p-5 shadow-[0_5px_25px_rgba(0,0,0,0.035)] sm:p-7">
+          <h2 className="mb-6 flex items-center gap-2 text-lg font-bold tracking-tight">
+            <span className="flex size-8 items-center justify-center rounded-full bg-[#111] text-sm text-white">+</span>
+            إضافة منتج
+          </h2>
           <form onSubmit={handleAddProduct} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
               placeholder="اسم المنتج (مثلاً: ساعة يد)"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white"
+              className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045]"
             />
             <input
               type="number"
               placeholder="السعر الحالي (مثلاً: 50)"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white"
+              className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045]"
             />
             <input
               type="number"
               placeholder="السعر الأصلي قبل التخفيض (اختياري)"
               value={originalPrice}
               onChange={(e) => setOriginalPrice(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white"
+              className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045]"
             />
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white"
-            >
-              <option value="clothing">ملابس</option>
-              <option value="perfume">عطور</option>
-              <option value="bags">حقائب</option>
-              <option value="electronics">إلكترونيات</option>
-              <option value="food">أغذية</option>
-              <option value="stationery">مكتبيات</option>
-            </select>
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setCategoryOpen((open) => !open)}
+                className="flex w-full items-center justify-between rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm transition-all duration-200 hover:border-black/20 focus:border-black"
+              >
+                <span>{selectedCategory}</span>
+                <motion.span
+                  animate={{ rotate: categoryOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-[#777]"
+                >
+                  <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </motion.span>
+              </button>
+
+              <AnimatePresence>
+                {categoryOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                    transition={{ duration: 0.16 }}
+                    className="absolute inset-x-0 top-[calc(100%+8px)] z-30 overflow-hidden rounded-2xl border border-black/[0.07] bg-white p-1.5 shadow-[0_15px_40px_rgba(0,0,0,0.12)]"
+                  >
+                    {categoryOptions.map((item) => (
+                      <button
+                        key={item.value}
+                        type="button"
+                        onClick={() => {
+                          setCategory(item.value);
+                          setCategoryOpen(false);
+                        }}
+                        className={[
+                          "flex w-full items-center justify-between rounded-xl px-4 py-3 text-right text-sm transition-colors",
+                          category === item.value
+                            ? "bg-[#111] font-semibold text-white"
+                            : "text-[#333] hover:bg-[#f3f3f3]",
+                        ].join(" ")}
+                      >
+                        {item.label}
+                        {category === item.value && <span>✓</span>}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <input
               type="text"
-              placeholder="رابط الصورة (من Unsplash أو رابط مباشر)"
+              placeholder="رابط صورة المنتج"
               value={image}
               onChange={(e) => setImage(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white md:col-span-2"
+              className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045] md:col-span-2"
             />
             <textarea
-              placeholder="وصف المنتج المختصر..."
+              placeholder="وصف المنتج..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white md:col-span-2"
+              className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045] md:col-span-2"
             />
-            <button
+
+            <motion.button
               type="submit"
-              className="md:col-span-2 bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-xl transition shadow-md"
+              disabled={isSubmitting}
+              whileHover={{ scale: 1.012 }}
+              whileTap={{ scale: 0.975 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="md:col-span-2 relative flex min-h-[52px] items-center justify-center gap-2 overflow-hidden rounded-[14px] bg-[#111] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_5px_15px_rgba(0,0,0,0.12)] transition-colors duration-200 hover:bg-[#292929] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              حفظ ونشر المنتج في المتجر فوراً 🚀
-            </button>
+              {isSubmitting ? (
+                <>
+                  <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  جارٍ النشر...
+                </>
+              ) : (
+                <>
+                  <span>نشر المنتج</span>
+                  <span>↗</span>
+                </>
+              )}
+            </motion.button>
           </form>
         </div>
 
-        {/* قائمة المنتجات مع زر الحذف */}
-        <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800">
-          <h2 className="text-lg font-semibold mb-4 text-purple-400">📦 المنتجات الحالية في المتجر ({products.length})</h2>
-          {loading ? (
-            <p className="text-gray-400 text-center py-6">جاري التحميل...</p>
-          ) : products.length === 0 ? (
-            <p className="text-gray-400 text-center py-6">لا توجد منتجات حالياً. أضف أول منتج بالأعلى!</p>
-          ) : (
-            <div className="space-y-3">
-              {products.map((prod) => (
-                <div key={prod.id} className="flex items-center justify-between bg-gray-800 p-3 rounded-xl border border-gray-700">
-                  <div className="flex items-center gap-3">
-                    <img src={prod.image} alt={prod.name} className="w-12 h-12 object-cover rounded-lg" />
-                    <div>
-                      <h4 className="font-semibold text-white">{prod.name}</h4>
-                      <p className="text-sm text-gray-400">${prod.price} | القسم: {prod.category}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleDelete(prod.id)}
-                    className="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-3 py-1.5 rounded-lg text-sm transition"
-                  >
-                    حذف 🗑️
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setCurrentView("products");
+            loadProducts();
+          }}
+          className="flex w-full items-center justify-between rounded-[20px] border border-black/[0.06] bg-white p-5 text-right shadow-[0_4px_20px_rgba(0,0,0,0.035)] transition-all duration-200 hover:border-black/15 hover:shadow-md active:scale-[0.99]"
+        >
+          <div>
+            <h2 className="text-base font-bold">منتجات المتجر</h2>
+            <p className="mt-1 text-sm text-[#888]">
+              عرض المنتجات وإدارتها وتعديلها
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="rounded-full bg-[#f1f1f1] px-3 py-1.5 text-sm font-semibold tabular-nums">
+              {products.length}
+            </span>
+            <span className="text-xl text-[#555]">←</span>
+          </div>
+        </button>
       </div>
     </div>
   );
-}
+    }
