@@ -8,7 +8,9 @@ export interface Category {
   isVisible?: boolean;
 }
 
-// جلب المنتجات
+/* ---------------------------------------------------------
+   [1] جلب المنتجات (الكل أو المفلترة حسب القسم)
+   --------------------------------------------------------- */
 export async function getStoreProducts(categoryId: string = "all"): Promise<Product[]> {
   try {
     const productsRef = collection(db, "products");
@@ -27,12 +29,14 @@ export async function getStoreProducts(categoryId: string = "all"): Promise<Prod
 
     return products;
   } catch (error) {
-    console.error("خطأ في جلب المنتجات:", error);
+    console.error("خطأ في جلب المنتجات من فايربيز:", error);
     return [];
   }
 }
 
-// جلب التخفيضات
+/* ---------------------------------------------------------
+   [2] جلب المنتجات المخفضة فقط (قسم التخفيضات / العروض)
+   --------------------------------------------------------- */
 export async function getDiscountedProducts(): Promise<Product[]> {
   try {
     const productsRef = collection(db, "products");
@@ -48,12 +52,14 @@ export async function getDiscountedProducts(): Promise<Product[]> {
 
     return discounted;
   } catch (error) {
-    console.error("خطأ في جلب التخفيضات:", error);
+    console.error("خطأ في جلب التخفيضات من فايربيز:", error);
     return [];
   }
 }
 
-// جلب الأقسام
+/* ---------------------------------------------------------
+   [3] جلب الأقسام الفعالة فقط للتحكم بالإظهار والإخفاء
+   --------------------------------------------------------- */
 export async function getStoreCategories(): Promise<Category[]> {
   try {
     const categoriesRef = collection(db, "categories");
@@ -70,15 +76,21 @@ export async function getStoreCategories(): Promise<Category[]> {
     return categories;
   } catch (error) {
     console.error("خطأ في جلب الأقسام:", error);
-    return [{ id: "all", label: "الكل" }];
+    return [
+      { id: "all", label: "الكل" },
+      { id: "clothing", label: "ملابس" },
+      { id: "perfume", label: "عطور" },
+      { id: "bags", label: "حقائب" },
+      { id: "electronics", label: "إلكترونيات" },
+      { id: "food", label: "أغذية" },
+      { id: "stationery", label: "مكتبيات" },
+    ];
   }
 }
 
-/* =========================================================
-   إدارة لوحة التحكم (إضافة وحذف المنتجات)
-   ========================================================= */
-
-// إضافة منتج جديد لقاعدة البيانات
+/* ---------------------------------------------------------
+   [4] إضافة منتج جديد (خاص بلوحة التحكم)
+   --------------------------------------------------------- */
 export async function addProduct(productData: Omit<Product, "id">) {
   try {
     const docRef = await addDoc(collection(db, "products"), productData);
@@ -89,7 +101,9 @@ export async function addProduct(productData: Omit<Product, "id">) {
   }
 }
 
-// حذف منتج من قاعدة البيانات
+/* ---------------------------------------------------------
+   [5] حذف منتج (خاص بلوحة التحكم)
+   --------------------------------------------------------- */
 export async function deleteProduct(productId: string) {
   try {
     await deleteDoc(doc(db, "products", productId));
