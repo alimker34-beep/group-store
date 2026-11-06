@@ -35,20 +35,24 @@ type Route =
   | { name: "notifications" }
   | { name: "checkout" }
   | { name: "success" }
-  | { name: "admin" }; // <-- أضف هذا السطر
+  | { name: "admin" };
 
-function resolveRoute(pathname: string): Route {
-  if (pathname === "/" || pathname === "/welcome") return { name: "welcome" };
-  if (pathname === "/store") return { name: "home" };
-  if (pathname === "/favorites") return { name: "favorites" };
-  if (pathname === "/offers") return { name: "offers" };
-  if (pathname === "/admin") return { name: "admin" }; // <-- أضف هذا الشرط
-  if (pathname === "/notifications") return { name: "notifications" };
-  if (pathname === "/checkout") return { name: "checkout" };
-  if (pathname === "/success") return { name: "success" };
+function resolveRoute(): Route {
+  // قراءة المسار من الـ Hash الموجود في الرابط (مثل #/admin)
+  const hash = window.location.hash.replace("#", "").trim();
+  const currentPath = hash || "/welcome";
 
-  if (pathname.startsWith("/product/")) {
-    const id = pathname.replace("/product/", "").trim();
+  if (currentPath === "/" || currentPath === "/welcome") return { name: "welcome" };
+  if (currentPath === "/store") return { name: "home" };
+  if (currentPath === "/favorites") return { name: "favorites" };
+  if (currentPath === "/offers") return { name: "offers" };
+  if (currentPath === "/admin") return { name: "admin" };
+  if (currentPath === "/notifications") return { name: "notifications" };
+  if (currentPath === "/checkout") return { name: "checkout" };
+  if (currentPath === "/success") return { name: "success" };
+
+  if (currentPath.startsWith("/product/")) {
+    const id = currentPath.replace("/product/", "").trim();
     if (id) return { name: "product", id };
   }
 
@@ -102,9 +106,7 @@ function readTheme(): boolean {
 }
 
 function App() {
-  const [route, setRoute] = useState<Route>(() =>
-    resolveRoute(window.location.pathname),
-  );
+  const [route, setRoute] = useState<Route>(() => resolveRoute());
 
   const [cart, setCart] = useState<CartItem[]>(() => readCart());
   const [cartOpen, setCartOpen] = useState(false);
@@ -115,26 +117,23 @@ function App() {
      NAVIGATION
      --------------------------------------------- */
   const navigate = useCallback((path: string) => {
-    window.history.pushState({}, "", path);
-    setRoute(resolveRoute(path));
+    // تحديث الهاش في الرابط مباشرة بدون طلب سيرفر جيت هاب
+    window.location.hash = path;
 
-    // If Lenis is active (optional), use its scrollTo to avoid mismatch.
     const lenis = (window as any).__lenis;
     if (lenis && typeof lenis.scrollTo === "function") {
-      // jump to top immediately without animation when navigating route-change:
       lenis.scrollTo(0, { immediate: true });
     } else {
-      // Native jump — keeps pipeline native (best performance)
       window.scrollTo({ top: 0, behavior: "auto" });
     }
   }, []);
 
   useEffect(() => {
-    const handlePopState = () => {
-      setRoute(resolveRoute(window.location.pathname));
+    const handleHashChange = () => {
+      setRoute(resolveRoute());
     };
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
   /* ---------------------------------------------
