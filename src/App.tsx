@@ -11,6 +11,7 @@ import FavoritesPage from "./pages/FavoritesPage";
 import OffersPage from "./pages/OffersPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
+import AdminPage from "./pages/AdminPage";
 import { CartSheet } from "./components/cart/CartSheet";
 import { FloatingCartButton } from "./components/cart/FloatingCartButton";
 import {
@@ -33,13 +34,15 @@ type Route =
   | { name: "product"; id: string }
   | { name: "notifications" }
   | { name: "checkout" }
-  | { name: "success" };
+  | { name: "success" }
+  | { name: "admin" }; // <-- أضف هذا السطر
 
 function resolveRoute(pathname: string): Route {
   if (pathname === "/" || pathname === "/welcome") return { name: "welcome" };
   if (pathname === "/store") return { name: "home" };
   if (pathname === "/favorites") return { name: "favorites" };
   if (pathname === "/offers") return { name: "offers" };
+  if (pathname === "/admin") return { name: "admin" }; // <-- أضف هذا الشرط
   if (pathname === "/notifications") return { name: "notifications" };
   if (pathname === "/checkout") return { name: "checkout" };
   if (pathname === "/success") return { name: "success" };
@@ -438,6 +441,15 @@ function App() {
 
               case "success":
                 return <OrderSuccessPage onNavigate={navigate} />;
+
+              case "admin":
+                return (
+                  <AdminPage
+                    onNavigate={navigate}
+                    isDark={isDark}
+                    onToggleTheme={toggleTheme}
+                  />
+                );
 
               default:
                 return (
