@@ -21,6 +21,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [currentView, setCurrentView] = useState<"dashboard" | "products">("dashboard");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -51,12 +52,15 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
   // جلب المنتجات عند تسجيل الدخول
   const loadProducts = async () => {
     setLoading(true);
+    setErrorMessage(null); // مسح أي خطأ سابق
 
     try {
       const data = await getStoreProducts("all");
       setProducts(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("فشل تحميل المنتجات:", error);
+      // عرض الخطأ الحقيقي على شاشة الهاتف مباشرة
+      setErrorMessage(`خطأ في التحميل: ${error?.message || JSON.stringify(error)}`);
     } finally {
       setLoading(false);
     }
@@ -128,13 +132,16 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
       setOriginalPrice("");
       setImage("");
       setDescription("");
+      setErrorMessage(null);
 
       await loadProducts();
 
       alert("تمت إضافة المنتج بنجاح!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("فشل نشر المنتج:", error);
-      alert("فشل نشر المنتج. افتح Console لمعرفة السبب.");
+      // التقاط رسالة الخطأ التقنية الحقيقية من فايربيز أو الشبكة وعرضها على الشاشة
+      const exactError = error?.message || JSON.stringify(error) || "خطأ غير معروف في الاتصال";
+      setErrorMessage(`خطأ فايربيز/الشبكة: ${exactError}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -372,6 +379,25 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
           </button>
         </div>
 
+        {/* صندوق عرض الأخطاء الحقيقية على الهاتف */}
+        {errorMessage && (
+          <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-right shadow-sm">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-bold text-red-700">⚠️ كشف الخطأ التقني:</span>
+              <button 
+                type="button" 
+                onClick={() => setErrorMessage(null)}
+                className="text-xs font-bold text-red-500 hover:text-red-800"
+              >
+                إغلاق ✕
+              </button>
+            </div>
+            <p className="text-xs font-mono text-red-600 break-all select-all">
+              {errorMessage}
+            </p>
+          </div>
+        )}
+
         {/* نموذج إضافة منتج */}
         <div className="mb-7 rounded-[24px] border border-black/[0.06] bg-white p-5 shadow-[0_5px_25px_rgba(0,0,0,0.035)] sm:p-7">
           <h2 className="mb-6 flex items-center gap-2 text-lg font-bold tracking-tight">
@@ -514,4 +540,4 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
       </div>
     </div>
   );
-    }
+}
