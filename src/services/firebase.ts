@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyArIjtHLBBVuzr2YDK07WmhRlvbKobuTKQ",
@@ -11,4 +11,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+
+// تهيئة صريحة لمنع تعليق طلبات الشبكة وحظر الـ Long-Polling
+export const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+});
