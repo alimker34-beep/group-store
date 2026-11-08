@@ -89,18 +89,31 @@ export async function getStoreCategories(): Promise<Category[]> {
 }
 
 /* ---------------------------------------------------------
-   [4] إضافة منتج جديد (خاص بلوحة التحكم)
+   [4] إضافة منتج جديد (كود المهندس المعتمد)
    --------------------------------------------------------- */
 export async function addProduct(productData: Omit<Product, "id">) {
+  console.log("[Firestore] 1. بدء عملية الإضافة");
+
   try {
-    console.log("بدء إرسال البيانات إلى Firestore...", productData);
-    
-    // تنفيذ الإضافة المباشرة
-    const docRef = await addDoc(collection(db, "products"), productData);
-    console.log("تمت الإضافة بنجاح، المعرف:", docRef.id);
+    console.log("[Firestore] 2. البيانات:", productData);
+    console.log("[Firestore] 3. إرسال الطلب إلى products");
+
+    const docRef = await addDoc(
+      collection(db, "products"),
+      productData
+    );
+
+    console.log("[Firestore] 4. نجحت الإضافة!");
+    console.log("[Firestore] Document ID:", docRef.id);
+
     return docRef.id;
-  } catch (error) {
-    console.error("خطأ تفصيلي في إضافة المنتج:", error);
+
+  } catch (error: any) {
+    console.error("[Firestore] فشلت الإضافة!");
+    console.error("Error code:", error?.code);
+    console.error("Error message:", error?.message);
+    console.error("Full error:", error);
+
     throw error;
   }
 }
