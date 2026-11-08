@@ -93,10 +93,14 @@ export async function getStoreCategories(): Promise<Category[]> {
    --------------------------------------------------------- */
 export async function addProduct(productData: Omit<Product, "id">) {
   try {
+    console.log("بدء إرسال البيانات إلى Firestore...", productData);
+    
+    // تنفيذ الإضافة المباشرة
     const docRef = await addDoc(collection(db, "products"), productData);
+    console.log("تمت الإضافة بنجاح، المعرف:", docRef.id);
     return docRef.id;
   } catch (error) {
-    console.error("خطأ في إضافة المنتج:", error);
+    console.error("خطأ تفصيلي في إضافة المنتج:", error);
     throw error;
   }
 }
