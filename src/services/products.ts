@@ -1,5 +1,3 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "./firebase";
 import type { Product } from "../components/products/ProductCard";
 
 export interface Category {
@@ -8,96 +6,94 @@ export interface Category {
   isVisible?: boolean;
 }
 
-// رابط الـ Worker مباشرة بدون الحاجة لملفات الـ env
+// رابط الـ Worker السحابي الخاص بك
 const WORKER_URL = "https://nexus-gate.smart346965.workers.dev";
+const CACHE_KEY = "group_store_products_cache_v1";
 
-// دالة مساعدة لجلب رمز الـ PIN الخاص بالأدمن من الذاكرة المحلية
+// دالة لجلب رمز الـ PIN الخاص بالأدمن من الذاكرة المحلية
 function getAdminPin(): string {
   return localStorage.getItem("admin_pin") || "12345";
 }
 
 /* ---------------------------------------------------------
-   [1] جلب المنتجات (الكل أو المفلترة حسب القسم)
+   [1] جلب المنتجات (مع التخزين المحلي والاستشعار الذكي للتحديثات)
    --------------------------------------------------------- */
 export async function getStoreProducts(categoryId: string = "all"): Promise<Product[]> {
   try {
-    const productsRef = collection(db, "products");
-    let q = query(productsRef);
+    // 1. محاولة القراءة السريعة من الذاكرة المحلية (LocalStorage) لظهور الفوري
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    let products: Product[] = cachedData ? JSON.parse(cachedData) : [];
 
-    if (categoryId !== "all") {
-      q = query(productsRef, where("category", "==", categoryId));
+    // 2. جلب التحديثات الحية من الـ Worker في الخلفية لتجاوز قيود الشبكة
+    const response = await fetch(`${WORKER_URL}/api/products`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.success && Array.isArray(result.products)) {
+        products = result.products;
+        // حفظ التحديثات الجديدة في القرص الصلب محلياً
+        localStorage.setItem(CACHE_KEY, JSON.stringify(products));
+      }
     }
 
-    const snapshot = await getDocs(q);
-    const products: Product[] = [];
-
-    snapshot.forEach((docItem) => {
-      products.push({ id: docItem.id, ...docItem.data() } as Product);
-    });
+    // التصفية حسب القسم إذا طُلب ذلك
+    if (categoryId !== "all") {
+      products = products.filter((p) => p.category === categoryId);
+    }
 
     return products;
   } catch (error) {
-    console.error("خطأ في جلب المنتجات من فايربيز:", error);
+    console.error("خطأ في جلب المنتجات عبر الـ Worker، يتم الاعتماد على الكاش المحلي:", error);
+    
+    // في حال انقطاع الشبكة تماماً، نعتمد على المخزن محلياً لكي لا يتوقف المتجر
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    if (cachedData) {
+      let products: Product[] = JSON.parse(cachedData);
+      if (categoryId !== "all") {
+        products = products.filter((p) => p.category === categoryId);
+      }
+      return products;
+    }
+
     return [];
   }
 }
 
 /* ---------------------------------------------------------
-   [2] جلب المنتجات المخفضة فقط (قسم التخفيضات / العروض)
+   [2] جلب المنتجات المخفضة فقط
    --------------------------------------------------------- */
 export async function getDiscountedProducts(): Promise<Product[]> {
   try {
-    const productsRef = collection(db, "products");
-    const snapshot = await getDocs(productsRef);
-    const discounted: Product[] = [];
-
-    snapshot.forEach((docItem) => {
-      const product = { id: docItem.id, ...docItem.data() } as Product;
-      if (product.originalPrice && product.originalPrice > product.price) {
-        discounted.push(product);
-      }
-    });
-
-    return discounted;
+    const products = await getStoreProducts("all");
+    return products.filter((product) => product.originalPrice && product.originalPrice > product.price);
   } catch (error) {
-    console.error("خطأ في جلب التخفيضات من فايربيز:", error);
+    console.error("خطأ في جلب التخفيضات:", error);
     return [];
   }
 }
 
 /* ---------------------------------------------------------
-   [3] جلب الأقسام الفعالة فقط للتحكم بالإظهار والإخفاء
+   [3] جلب الأقسام الفعالة
    --------------------------------------------------------- */
 export async function getStoreCategories(): Promise<Category[]> {
-  try {
-    const categoriesRef = collection(db, "categories");
-    const snapshot = await getDocs(categoriesRef);
-    const categories: Category[] = [{ id: "all", label: "الكل" }];
-
-    snapshot.forEach((docItem) => {
-      const data = docItem.data() as Category;
-      if (data.isVisible !== false) {
-        categories.push({ id: docItem.id, label: data.label });
-      }
-    });
-
-    return categories;
-  } catch (error) {
-    console.error("خطأ في جلب الأقسام:", error);
-    return [
-      { id: "all", label: "الكل" },
-      { id: "clothing", label: "ملابس" },
-      { id: "perfume", label: "عطور" },
-      { id: "bags", label: "حقائب" },
-      { id: "electronics", label: "إلكترونيات" },
-      { id: "food", label: "أغذية" },
-      { id: "stationery", label: "مكتبيات" },
-    ];
-  }
+  return [
+    { id: "all", label: "الكل" },
+    { id: "clothing", label: "ملابس" },
+    { id: "perfume", label: "عطور" },
+    { id: "bags", label: "حقائب" },
+    { id: "electronics", label: "إلكترونيات" },
+    { id: "food", label: "أغذية" },
+    { id: "stationery", label: "مكتبيات" },
+  ];
 }
 
 /* ---------------------------------------------------------
-   [4] إضافة منتج جديد (عبر الـ Worker السحابي لتجاوز تعليق الشبكة)
+   [4] إضافة منتج جديد عبر الـ Worker السحابي
    --------------------------------------------------------- */
 export async function addProduct(productData: Omit<Product, "id">) {
   console.log("[Worker] 1. بدء إرسال المنتج عبر الـ Worker...", productData);
@@ -119,6 +115,10 @@ export async function addProduct(productData: Omit<Product, "id">) {
     }
 
     console.log("[Worker] 4. نجحت الإضافة بنجاح! المعرف:", result.id);
+    
+    // مسح الكاش المحلي لتجبار النظام على جلب القائمة المحدثة فوراً في المرة القادمة
+    localStorage.removeItem(CACHE_KEY);
+
     return result.id;
 
   } catch (error: any) {
@@ -128,7 +128,7 @@ export async function addProduct(productData: Omit<Product, "id">) {
 }
 
 /* ---------------------------------------------------------
-   [5] حذف منتج (عبر الـ Worker السحابي)
+   [5] حذف منتج عبر الـ Worker السحابي
    --------------------------------------------------------- */
 export async function deleteProduct(productId: string) {
   console.log("[Worker] جاري حذف المنتج عبر الـ Worker...", productId);
@@ -148,6 +148,10 @@ export async function deleteProduct(productId: string) {
     }
 
     console.log("[Worker] تم الحذف بنجاح:", result.deletedId);
+
+    // مسح الكاش المحلي لتحديث البيانات
+    localStorage.removeItem(CACHE_KEY);
+
     return result.deletedId;
 
   } catch (error: any) {
