@@ -9,7 +9,7 @@ export interface Category {
 }
 
 // رابط الـ Worker مباشرة بدون الحاجة لملفات الـ env
-const WORKER_URL = "https://رابط_الوركر_الخاص_بك.workers.dev";
+const WORKER_URL = "https://nexus-gate.smart346965.workers.dev";
 
 // دالة مساعدة لجلب رمز الـ PIN الخاص بالأدمن من الذاكرة المحلية
 function getAdminPin(): string {
