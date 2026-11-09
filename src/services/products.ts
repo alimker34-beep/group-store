@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "./firebase";
 import type { Product } from "../components/products/ProductCard";
 
@@ -6,6 +6,15 @@ export interface Category {
   id: string;
   label: string;
   isVisible?: boolean;
+}
+
+// رابط الـ Worker من متغيرات البيئة في Vite
+const WORKER_URL = import.meta.env.VITE_WORKER_URL || "";
+
+// دالة مساعدة لجلب رمز الـ PIN الخاص بالأدمن من الذاكرة المحلية أو الحالة المعتمدة لديك
+function getAdminPin(): string {
+  // يمكنك تعديل هذه الطريقة بحسب المكان الذي تخزن فيه الـ PIN في صفحة الأدمن لديك
+  return localStorage.getItem("admin_pin") || "12345";
 }
 
 /* ---------------------------------------------------------
@@ -89,43 +98,61 @@ export async function getStoreCategories(): Promise<Category[]> {
 }
 
 /* ---------------------------------------------------------
-   [4] إضافة منتج جديد (كود المهندس المعتمد)
+   [4] إضافة منتج جديد (عبر الـ Worker السحابي لتجاوز تعليق الشبكة)
    --------------------------------------------------------- */
 export async function addProduct(productData: Omit<Product, "id">) {
-  console.log("[Firestore] 1. بدء عملية الإضافة");
+  console.log("[Worker] 1. بدء إرسال المنتج عبر الـ Worker...", productData);
 
   try {
-    console.log("[Firestore] 2. البيانات:", productData);
-    console.log("[Firestore] 3. إرسال الطلب إلى products");
+    const response = await fetch(`${WORKER_URL}/api/products`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Admin-Pin": getAdminPin()
+      },
+      body: JSON.stringify(productData)
+    });
 
-    const docRef = await addDoc(
-      collection(db, "products"),
-      productData
-    );
+    const result = await response.json();
 
-    console.log("[Firestore] 4. نجحت الإضافة!");
-    console.log("[Firestore] Document ID:", docRef.id);
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "فشل إرسال المنتج عبر الـ Worker");
+    }
 
-    return docRef.id;
+    console.log("[Worker] 4. نجحت الإضافة بنجاح! المعرف:", result.id);
+    return result.id;
 
   } catch (error: any) {
-    console.error("[Firestore] فشلت الإضافة!");
-    console.error("Error code:", error?.code);
-    console.error("Error message:", error?.message);
-    console.error("Full error:", error);
-
+    console.error("[Worker] فشلت الإضافة:", error);
     throw error;
   }
 }
 
 /* ---------------------------------------------------------
-   [5] حذف منتج (خاص بلوحة التحكم)
+   [5] حذف منتج (عبر الـ Worker السحابي)
    --------------------------------------------------------- */
 export async function deleteProduct(productId: string) {
+  console.log("[Worker] جاري حذف المنتج عبر الـ Worker...", productId);
+
   try {
-    await deleteDoc(doc(db, "products", productId));
-  } catch (error) {
-    console.error("خطأ في حذف المنتج:", error);
+    const response = await fetch(`${WORKER_URL}/api/products/${productId}`, {
+      method: "DELETE",
+      headers: {
+        "X-Admin-Pin": getAdminPin()
+      }
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "فشل حذف المنتج عبر الـ Worker");
+    }
+
+    console.log("[Worker] تم الحذف بنجاح:", result.deletedId);
+    return result.deletedId;
+
+  } catch (error: any) {
+    console.error("[Worker] خطأ في حذف المنتج:", error);
     throw error;
   }
 }
