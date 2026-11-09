@@ -8,12 +8,11 @@ export interface Category {
   isVisible?: boolean;
 }
 
-// رابط الـ Worker من متغيرات البيئة في Vite
-const WORKER_URL = import.meta.env.VITE_WORKER_URL || "";
+// رابط الـ Worker مباشرة بدون الحاجة لملفات الـ env
+const WORKER_URL = "https://رابط_الوركر_الخاص_بك.workers.dev";
 
-// دالة مساعدة لجلب رمز الـ PIN الخاص بالأدمن من الذاكرة المحلية أو الحالة المعتمدة لديك
+// دالة مساعدة لجلب رمز الـ PIN الخاص بالأدمن من الذاكرة المحلية
 function getAdminPin(): string {
-  // يمكنك تعديل هذه الطريقة بحسب المكان الذي تخزن فيه الـ PIN في صفحة الأدمن لديك
   return localStorage.getItem("admin_pin") || "12345";
 }
 
