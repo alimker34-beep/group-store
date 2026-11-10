@@ -204,14 +204,14 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
           />
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition text-sm"
           >
             دخول للوحة التحكم
           </button>
           <button
             type="button"
             onClick={() => onNavigate("/store")}
-            className="w-full mt-3 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2 rounded-xl transition text-sm"
+            className="w-full mt-3 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium py-3 rounded-xl transition text-sm"
           >
             العودة للمتجر
           </button>
@@ -449,6 +449,13 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
               onChange={(e) => setPrice(e.target.value)}
               className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045]"
             />
+            <input
+              type="number"
+              placeholder="السعر الأصلي قبل التخفيض (اختياري)"
+              value={originalPrice}
+              onChange={(e) => setOriginalPrice(e.target.value)}
+              className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045]"
+            />
 
             <label className="flex items-center gap-3 cursor-pointer md:col-span-2 py-1 select-none">
               <input
@@ -457,18 +464,8 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
                 onChange={(e) => setIsDiscountProduct(e.target.checked)}
                 className="size-4 rounded border-black/20 text-black focus:ring-black"
               />
-              <span className="text-sm font-semibold text-[#333]">هذا المنتج ضمن قسم التخفيضات والعروض</span>
+              <span className="text-sm font-semibold text-[#333]">نقل المنتج إلى قسم التخفيضات والعروض</span>
             </label>
-
-            {isDiscountProduct && (
-              <input
-                type="number"
-                placeholder="السعر الأصلي قبل التخفيض (مطلوب)"
-                value={originalPrice}
-                onChange={(e) => setOriginalPrice(e.target.value)}
-                className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045] md:col-span-2"
-              />
-            )}
 
             <div className="relative">
               <button
@@ -526,17 +523,22 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
                 صورة المنتج (اختر من المعرض أو الاستوديو):
               </label>
               
-              <div className="relative">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-black/20 rounded-[20px] bg-[#fafafa] hover:bg-[#f2f2f2] cursor-pointer transition-all duration-200">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
+                  <span className="text-2xl mb-1">📁</span>
+                  <p className="text-xs font-semibold text-[#333]">اضغط هنا لاختيار صورة المنتج من المعرض</p>
+                  <p className="text-[10px] text-[#888] mt-1">يدعم PNG, JPG, WEBP</p>
+                </div>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
-                  className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3 text-sm text-[#111] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-[#111] file:text-white hover:file:bg-[#292929] cursor-pointer"
+                  className="hidden"
                 />
-              </div>
+              </label>
 
               {uploadingImage && (
-                <p className="text-xs font-bold text-blue-600 animate-pulse">
+                <p className="text-xs font-bold text-blue-600 animate-pulse text-center">
                   ⏳ جاري رفع الصورة من هاتفك إلى السحاب...
                 </p>
               )}
@@ -594,14 +596,13 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <span className="rounded-full bg-[#f1f1f1] px-3 py-1.5 text-sm font-semibold tabular-nums">
               {products.length}
             </span>
-            <span className="text-xl text-[#555]">←</span>
           </div>
         </button>
       </div>
     </div>
   );
-    }
+      }
