@@ -32,6 +32,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
   // حقول نموذج إضافة منتج جديد
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [isDiscountProduct, setIsDiscountProduct] = useState(false);
   const [originalPrice, setOriginalPrice] = useState("");
   const [category, setCategory] = useState("clothing");
   const [image, setImage] = useState("");
@@ -94,7 +95,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
     }
 
     const numericPrice = Number(price);
-    const numericOriginalPrice = originalPrice
+    const numericOriginalPrice = isDiscountProduct && originalPrice
       ? Number(originalPrice)
       : undefined;
 
@@ -103,12 +104,8 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
       return;
     }
 
-    if (
-      numericOriginalPrice !== undefined &&
-      (!Number.isFinite(numericOriginalPrice) ||
-        numericOriginalPrice <= numericPrice)
-    ) {
-      alert("السعر الأصلي يجب أن يكون أكبر من السعر الحالي");
+    if (isDiscountProduct && (numericOriginalPrice === undefined || numericOriginalPrice <= numericPrice)) {
+      alert("يرجى إدخال سعر أصلي أكبر من السعر الحالي لمنتجات التخفيضات");
       return;
     }
 
@@ -130,6 +127,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
       setName("");
       setPrice("");
       setOriginalPrice("");
+      setIsDiscountProduct(false);
       setImage("");
       setDescription("");
       setErrorMessage(null);
@@ -222,61 +220,63 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
               لا توجد منتجات حتى الآن.
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="space-y-3">
               {products.map((prod) => (
                 <motion.article
                   key={prod.id}
                   layout
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="overflow-hidden rounded-[20px] border border-black/[0.06] bg-white shadow-[0_4px_18px_rgba(0,0,0,0.035)]"
+                  className="flex items-center justify-between gap-4 rounded-[20px] border border-black/[0.06] bg-white p-4 shadow-[0_4px_18px_rgba(0,0,0,0.035)]"
                 >
-                  <div className="aspect-[4/5] overflow-hidden bg-[#f2f2f2]">
-                    <img
-                      src={prod.image}
-                      alt={prod.name}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="size-16 shrink-0 overflow-hidden rounded-xl bg-[#f2f2f2]">
+                      <img
+                        src={prod.image}
+                        alt={prod.name}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-bold text-[#111]">
+                        {prod.name}
+                      </h3>
+
+                      <p className="mt-1 text-sm font-semibold tabular-nums text-[#111]">
+                        ${prod.price}
+                      </p>
+
+                      <p className="mt-0.5 truncate text-xs text-[#888]">
+                        {categoryOptions.find((item) => item.value === prod.category)?.label ?? prod.category}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="p-3">
-                    <h3 className="truncate text-sm font-bold">
-                      {prod.name}
-                    </h3>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        // منطق التعديل
+                      }}
+                      className="flex size-10 items-center justify-center rounded-xl bg-[#f5f5f5] text-[#111] transition hover:bg-[#e5e5e5] active:scale-95"
+                      title="تعديل"
+                    >
+                      ✏️
+                    </button>
 
-                    <p className="mt-1 text-sm font-semibold tabular-nums">
-                      ${prod.price}
-                    </p>
-
-                    <p className="mt-1 truncate text-xs text-[#888]">
-                      {categoryOptions.find((item) => item.value === prod.category)?.label ?? prod.category}
-                    </p>
-
-                    <div className="mt-4 grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setProductToDelete(prod.id);
-                          setShowDeleteModal(true);
-                        }}
-                        className="flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 active:scale-95"
-                      >
-                        <span>حذف</span>
-                        <span>⌫</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          // سنربط التعديل بعد التأكد من خدمة updateProduct
-                        }}
-                        className="flex items-center justify-center gap-1.5 rounded-xl bg-[#111] py-2.5 text-xs font-semibold text-white transition hover:bg-[#292929] active:scale-95"
-                      >
-                        <span>تعديل</span>
-                        <span>✎</span>
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProductToDelete(prod.id);
+                        setShowDeleteModal(true);
+                      }}
+                      className="flex size-10 items-center justify-center rounded-xl bg-[#f5f5f5] text-[#111] transition hover:bg-[#e5e5e5] active:scale-95"
+                      title="حذف"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </motion.article>
               ))}
@@ -372,10 +372,9 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
           <button
             type="button"
             onClick={() => onNavigate("/store")}
-            className="flex shrink-0 items-center gap-2 rounded-full bg-[#111] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#292929] active:scale-[0.97]"
+            className="flex shrink-0 items-center rounded-full bg-[#111] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#292929] active:scale-[0.97]"
           >
-            <span>المتجر</span>
-            <span aria-hidden="true">↗</span>
+            المتجر
           </button>
         </div>
 
@@ -419,13 +418,26 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
               onChange={(e) => setPrice(e.target.value)}
               className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045]"
             />
-            <input
-              type="number"
-              placeholder="السعر الأصلي قبل التخفيض (اختياري)"
-              value={originalPrice}
-              onChange={(e) => setOriginalPrice(e.target.value)}
-              className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045]"
-            />
+
+            <label className="flex items-center gap-3 cursor-pointer md:col-span-2 py-1 select-none">
+              <input
+                type="checkbox"
+                checked={isDiscountProduct}
+                onChange={(e) => setIsDiscountProduct(e.target.checked)}
+                className="size-4 rounded border-black/20 text-black focus:ring-black"
+              />
+              <span className="text-sm font-semibold text-[#333]">هذا المنتج ضمن قسم التخفيضات والعروض</span>
+            </label>
+
+            {isDiscountProduct && (
+              <input
+                type="number"
+                placeholder="السعر الأصلي قبل التخفيض (مطلوب)"
+                value={originalPrice}
+                onChange={(e) => setOriginalPrice(e.target.value)}
+                className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045] md:col-span-2"
+              />
+            )}
 
             <div className="relative">
               <button
@@ -506,10 +518,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
                   جارٍ النشر...
                 </>
               ) : (
-                <>
-                  <span>نشر المنتج</span>
-                  <span>↗</span>
-                </>
+                "نشر المنتج"
               )}
             </motion.button>
           </form>
@@ -540,4 +549,4 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
       </div>
     </div>
   );
-}
+                                  }
