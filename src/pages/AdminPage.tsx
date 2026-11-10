@@ -37,6 +37,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
   const [category, setCategory] = useState("clothing");
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const categoryOptions = [
     { value: "clothing", label: "ملابس" },
@@ -80,6 +81,36 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
       setIsAuthenticated(true);
     } else {
       alert("كلمة المرور غير صحيحة!");
+    }
+  };
+
+  // دالة رفع الصورة مباشرة من معرض الهاتف عبر ImgBB API
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      // ⚠️ استبدل YOUR_IMGBB_API_KEY بمفتاح الـ API الفعلي الخاص بحسابك في ImgBB
+      const response = await fetch("https://api.imgbb.com/1/upload?key=bfec0ffb6937ed0a7998adf80f615b9c", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.success && data.data?.url) {
+        setImage(data.data.url); // تعيين الرابط الناتج تلقائياً في خانة الصورة
+      } else {
+        alert("فشل رفع الصورة، تحقق من مفتاح الـ API الخاص بـ ImgBB");
+      }
+    } catch (err) {
+      console.error("خطأ في رفع الصورة:", err);
+      alert("حدث خطأ أثناء الاتصال بخدمة الرفع");
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -490,13 +521,37 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
               </AnimatePresence>
             </div>
 
-            <input
-              type="text"
-              placeholder="رابط صورة المنتج"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3.5 text-sm text-[#111] outline-none transition-all duration-200 placeholder:text-[#999] hover:border-black/20 focus:border-black focus:bg-white focus:ring-4 focus:ring-black/[0.045] md:col-span-2"
-            />
+            <div className="md:col-span-2 space-y-2">
+              <label className="block text-sm font-semibold text-[#333]">
+                صورة المنتج (اختر من المعرض أو الاستوديو):
+              </label>
+              
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="w-full rounded-[13px] border border-black/[0.09] bg-[#fafafa] px-4 py-3 text-sm text-[#111] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-[#111] file:text-white hover:file:bg-[#292929] cursor-pointer"
+                />
+              </div>
+
+              {uploadingImage && (
+                <p className="text-xs font-bold text-blue-600 animate-pulse">
+                  ⏳ جاري رفع الصورة من هاتفك إلى السحاب...
+                </p>
+              )}
+
+              {image && (
+                <div className="flex items-center gap-3 mt-2 p-2.5 rounded-2xl bg-white border border-black/5 shadow-sm">
+                  <img src={image} alt="معاينة المنتج" className="size-14 rounded-xl object-cover border" />
+                  <div className="min-w-0">
+                    <p className="text-xs text-green-600 font-bold">✓ تم إرفاق ورفع الصورة بنجاح</p>
+                    <p className="text-[10px] text-gray-400 truncate">{image}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <textarea
               placeholder="وصف المنتج..."
               value={description}
@@ -549,4 +604,4 @@ export default function AdminPage({ onNavigate }: AdminPageProps) {
       </div>
     </div>
   );
-                                  }
+    }
