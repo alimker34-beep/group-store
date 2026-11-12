@@ -116,6 +116,7 @@ export default function HomePage({
           </div>
 
           <ProductGrid
+            products={products}
             categoryFilter={activeCategory}
             isInCart={isInCart}
             isFavorite={(id) => favorites.includes(id)}
@@ -140,4 +141,4 @@ export default function HomePage({
       />
     </main>
   );
-}
+  }
