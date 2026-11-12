@@ -1,6 +1,7 @@
 import React from "react";
 
-interface ResponsiveImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+interface ResponsiveImageProps
+  extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
   srcSet?: string;
@@ -8,6 +9,7 @@ interface ResponsiveImageProps extends React.ImgHTMLAttributes<HTMLImageElement>
   priority?: boolean;
   width?: number;
   height?: number;
+  objectPosition?: string;
 }
 
 export function ResponsiveImage({
@@ -21,6 +23,8 @@ export function ResponsiveImage({
   width,
   height,
   className,
+  objectPosition = "center",
+  style,
   ...rest
 }: ResponsiveImageProps) {
   const finalLoading = priority ? "eager" : loading ?? "lazy";
@@ -38,7 +42,11 @@ export function ResponsiveImage({
       decoding={decoding}
       fetchPriority={priority ? "high" : undefined}
       className={className}
-      {...(rest as any)}
+      style={{
+        ...style,
+        objectPosition,
+      }}
+      {...rest}
     />
   );
 }
