@@ -179,18 +179,32 @@ export function ProductDetailsSheet({
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-4 pb-5 sm:px-5">
-              <div className="flex snap-x snap-mandatory items-center gap-3 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {gallery.map((image, index) => (
                   <div
                     key={`${image}-${index}`}
-                    className="flex w-full shrink-0 snap-center items-center justify-center overflow-hidden rounded-[var(--radius-xl)] bg-surface-muted"
+                    className="relative aspect-[4/5] max-h-[65dvh] w-full shrink-0 snap-center isolate overflow-hidden rounded-[var(--radius-xl)] bg-surface-muted"
                   >
+                    {/* خلفية ممتدة لملء المساحة */}
+                    <img
+                      src={image}
+                      alt=""
+                      aria-hidden="true"
+                      loading="lazy"
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full scale-110 object-cover object-center blur-2xl opacity-50"
+                    />
+
+                    {/* طبقة خفيفة لتوحيد الخلفية */}
+                    <div className="absolute inset-0 bg-white/10" aria-hidden="true" />
+
+                    {/* الصورة الأصلية كاملة */}
                     <img
                       src={image}
                       alt={index === 0 ? product.name : ""}
                       loading={index === 0 ? "eager" : "lazy"}
                       decoding="async"
-                      className="block h-auto max-h-[65dvh] w-full object-contain object-center"
+                      className="absolute inset-0 z-10 h-full w-full object-contain object-center"
                     />
                   </div>
                 ))}
@@ -413,4 +427,4 @@ function QuantityControl({ value, onChange }: QuantityControlProps) {
       </button>
     </div>
   );
-    }
+                                     }
