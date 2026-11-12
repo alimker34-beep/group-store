@@ -27,6 +27,9 @@ export interface Product {
   description?: string;
   images?: string[];
   options?: ProductOption[];
+
+  imageFit?: "cover" | "contain";
+  imagePosition?: string;
 }
 
 interface ProductCardProps {
@@ -191,12 +194,7 @@ export const ProductCard = memo(function ProductCard({
             priority={priority}
             decoding="async"
             loading={priority ? "eager" : "lazy"}
-            className={[
-              "absolute inset-0 h-full w-full object-contain object-center p-1.5",
-              "transition-transform duration-[var(--motion-normal)]",
-              "ease-[var(--ease-emphasized)]",
-              "group-hover:scale-[1.035]",
-            ].join(" ")}
+            className="absolute inset-0 block h-full w-full object-cover object-center"
           />
 
           {/* Subtle gradient overlay for icons legibility */}
