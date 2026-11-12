@@ -192,7 +192,7 @@ export const ProductCard = memo(function ProductCard({
             decoding="async"
             loading={priority ? "eager" : "lazy"}
             className={[
-              "absolute inset-0 h-full w-full object-cover object-center",
+              "absolute inset-0 h-full w-full object-contain object-center p-1.5",
               "transition-transform duration-[var(--motion-normal)]",
               "ease-[var(--ease-emphasized)]",
               "group-hover:scale-[1.035]",
@@ -310,7 +310,7 @@ export const ProductCard = memo(function ProductCard({
       <button
         type="button"
         onClick={() => onSelect?.(product)}
-        className="mt-3 block w-full min-w-0 text-left"
+        className="mt-3 block w-full min-w-0 text-right"
       >
         <h3 className="truncate text-sm font-medium leading-5 text-foreground">
           {product.name}
@@ -342,4 +342,3 @@ export const ProductCard = memo(function ProductCard({
     </article>
   );
 });
-
